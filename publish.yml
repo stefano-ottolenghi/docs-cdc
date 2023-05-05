@@ -1,13 +1,13 @@
 # Use this playbook file when you need to build and publish multuple versions of your content together
 site:
-  title: Neo4j Docs Template
-  url: https://neo4j.com/docs/add-on
-  start_page: docs-template:ROOT:index.adoc
+  title: Change Data Capture
+  url: https://neo4j.com/docs
+  start_page: cdc:ROOT:index.adoc
 
 content:
   sources:
   - url: https://github.com/neo4j/docs-template.git
-    branches: ['master', 'dev']
+    branches: ['main']
     exclude:
     - '!**/_includes/*'
     - '!**/readme.adoc'
