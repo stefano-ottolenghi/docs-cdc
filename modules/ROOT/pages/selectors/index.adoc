@@ -1,0 +1,152 @@
+[[cdc-selectors]]
+= Selectors
+:description: This chapter describes how to filter captured change data.
+
+`cdc.query` procedure support filtering returned changes using user provided selectors.
+
+== Selector schema
+
+Full schema for selectors is defined below.
+Each selector can contain a number of supported filters, where each filter needs to be satisfied by the change event to be included in the output.
+
+=== Selecting entities
+
+You can construct selectors that can both match nodes and relationships.
+
+[source, json]
+----
+{
+  "select": "e", // <1>
+  "operation": "c", // <2>
+  "changesTo": ["name", "title"] // <3>
+}
+----
+All fields except for `select` are optional.
+
+<1> Select changes on all entities.
+Other valid values are `"n"` for nodes and `"r"` for relationships.
+<2> Select changes which are creating entities.
+Other valid values are `"u"` for entity updates and `"d"` for entity deletions.
+<3> Select changes which affected all of the provided properties.
+
+=== Selecting nodes
+
+You can construct selectors that can only match nodes.
+
+[source, json]
+----
+{
+  "select": "n", // <1>
+  "elementId": "4:b7e35973-0aff-42fa-873b-5de31868cb4a:1", // <2>
+  "key": { // <3>
+    "property": "value",
+    "otherProperty": "value"
+  },
+  "labels": ["Person", "Actor"], // <4>
+  "operation": "c", // <5>
+  "changesTo": ["name", "lastName"] // <6>
+}
+----
+All fields except for `select` are optional.
+
+<1> Select changes on nodes.
+Other valid values are `"e"` for all entities and `"r"` for relationships.
+<2> Select changes on the node with this element id.
+See link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/functions/scalar/#functions-elementid[Cypher Manual -> Functions -> Scalar functions] for more information on element ids.
+<3> Select changes on nodes with matching key properties.
+Key matching is only possible when specific constraints are defined on the node, see xref:getting-started/constraints.adoc[] for details.
+<4> Select changes on nodes which have _all_ of the specified labels.
+<5> Select changes which are creating nodes.
+Other valid values are `"u"` for node updates and `"d"` for node deletions.
+<6> Select changes which affect _all_ of the specified properties.
+
+=== Selecting relationships
+
+You can construct selectors that can only match relationships.
+
+[source, json, role="nocollapse"]
+----
+{
+  "select": "r", // <1>
+  "elementId": "4:b7e35973-0aff-42fa-873b-5de31868cb4a:1", // <2>
+  "type": "ACTED_IN", // <3>
+  "key": { // <4>
+    "property": "value",
+    "otherProperty": "value"
+  }, 
+  "start": { // <5>
+    "select": "n", // <6>
+    "elementId": "4:b7e35973-0aff-42fa-873b-5de31868cb4a:1", // <7>
+    "key": { // <8>
+      "userId": "1001",
+      "name": "John"
+    },
+    "labels": ["Person", "Actor"] // <9>
+  },
+  "end":{ // <10>
+    "select": "n",
+    "elementId": "5:b7e35973-0aff-42fa-873b-5de31878ab4a:3",
+    "key": {
+      "title": "Matrix"
+    },
+    "labels": ["Movie"]
+  },
+  "operation": "c", // <11>
+  "changesTo": ["name", "lastName"] // <12>
+}
+----
+All fields except for `select` are optional.
+
+<1> Select changes on relationships.
+Other valid values are `"e"` for all entities and `"n"` for nodes.
+<2> Select changes on the relationship with this element id.
+See link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/functions/scalar/#functions-elementid[Cypher Manual -> Functions -> Scalar functions] for more information on element ids.
+<3> Select changes on relationships with this type.
+<4> Select changes on relationships with matching key properties.
+Key matching is only possible when specific constraints are defined on the relationship, see xref:getting-started/constraints.adoc[] for details.
+<5> Select changes on relationships with a start node matching this node selector.
+Note that `operation` and `changesTo` are not valid inside these node selectors.
+<6> Optionally specify that this is a node selector.
+Specifying `"r"` or `"e"` here will cause an error.
+<7> Select relationships where the start node has this element id.
+See link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/functions/scalar/#functions-elementid[Cypher Manual -> Functions -> Scalar functions] for more information on element ids.
+<8> Select relationships where the start node has these key properties.
+Key matching is only possible when specific constraints are defined on the node, see xref:getting-started/constraints.adoc[] for details.
+<9> Select relationships where the start node has these labels.
+<10> Select relationships with end nodes matching this node selector.
+Same schema as `start`.
+<11> Select changes which are creating relationships.
+Other valid values are `"u"` for relationship updates and `"d"` for relationship deletions.
+<12> Select changes where all specified properties are affected.
+
+[NOTE]
+====
+The relationship start and end node selectors mostly satisfy the regular node selector schema.
+The only exception is that you cannot specify `operation` and `changesTo` fields inside relationship start and end node selectors.
+====
+
+[[combining-selectors]]
+== Combining selectors
+
+The more specific a selector is, the fewer changes are returned.
+For example, specifying both `name` and `surname` as a `changesTo` value only returns changes where both `name` *and* `surname` properties have changed within the same transaction.
+
+.Query changes updating both `name` and `surname` properties
+[source, cypher]
+----
+CALL cdc.query($previousChangeId, [{select:"n", changesTo:["name", "surname"]}])
+----
+
+In order to extract changes for either `name` *or* `surname` properties, two separate selectors have to be specified:
+
+.Query changes updating either `name` or `surname` properties
+[source, cypher]
+----
+CALL cdc.query($previousChangeId, [
+    {select:"n", changesTo:["name"]},
+    {select:"n", changesTo:["surname"]}
+])
+----
+
+
+

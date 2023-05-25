@@ -1,7 +1,16 @@
 name: cdc
-title: Change Data Capture
 version: '5'
-# display_version: '1.0-preview'
+title: Change Data Capture
 start_page: ROOT:index.adoc
 nav:
 - modules/ROOT/content-nav.adoc
+
+asciidoc:
+  attributes:
+    theme: docs
+    copyright: Neo4j Inc.
+    page-product: Change Data Capture
+    page-pagination: true
+    product-name: Change Data Capture
+    url-common-license-page: https://neo4j.com/docs/license/
+    page-canonical-root: /docs

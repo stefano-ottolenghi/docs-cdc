@@ -1,0 +1,10 @@
+[role=enterprise-edition]
+[[procedures]]
+= Procedures
+:description: This chapter describes change data capture procedures.
+
+This chapter describes the following:
+
+* xref:procedures/query.adoc[]
+* xref:procedures/earliest.adoc[]
+* xref:procedures/current.adoc[]

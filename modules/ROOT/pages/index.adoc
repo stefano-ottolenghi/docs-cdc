@@ -1,17 +1,32 @@
-= Docs template
+[role=enterprise-edition]
+[[change-data-capture]]
+ifdef::backend-pdf[]
 
-This is the main index page for your docs project.
+= Change Data Capture Early Access Program
 
-== Start page
+== Introduction
 
-When you build your content locally, this page should be specified as the start page in _preview.yml_.
+endif::[]
+ifndef::backend-pdf[]
 
-[source, yaml, role=noheader]
-----
-start_page: docs-template:ROOT:index.adoc
-----
+= Introduction
 
-[TIP]
-====
-This repo contains example content such as asciidoc pages, re-usable fragments, and examples, to show where different types of files should be stored in an Antora project.
-====
+endif::[]
+
+include::partial$experimental.adoc[]
+
+Change data capture (CDC) allows you to capture and track changes to your database in real-time, enabling you to keep your other data sources up-to-date and accurate.
+With CDC, you can identify and respond to changes (create, update, and delete) on your graph entities (nodes and relationships) as they happen, and integrate these changes into other systems and applications.
+
+The CDC feature is straightforward to set up and use and allows you to quickly and efficiently capture and replicate changes to your data without disruptions to your workflow.
+
+The documentation guides you through the process of setting up CDC, configuring it to capture the changes, and querying those changes for further processing, such as replicating to another system.
+It also contains best practices and troubleshooting tips to ensure that your CDC implementation runs smoothly.
+
+== Known Limitations
+
+=== Neo4j 5.8
+
+* CDC in a cluster environment may raise errors when a CDC query is completed on one cluster server and the next query is executed on another server that has just completed a store copy.
+Retrying the query on a different cluster server may help resolve the error.
+_**A future Early Access Program build will include full support of clusters and Aura through a consistent view of transaction logs on all cluster members that host the database in question, where this view being limited to cover the period defined by `db.tx_log.rotation.retention_policy` setting.**_

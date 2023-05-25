@@ -1,0 +1,11 @@
+[role=enterprise-edition]
+[[setup]]
+= Getting Started
+:description: This chapter describes how to configure Neo4j for change data capture.
+
+This chapter describes the following:
+
+* xref:getting-started/key-considerations.adoc[]
+* xref:getting-started/feature-flag.adoc[]
+* xref:getting-started/enrichment-mode.adoc[]
+* xref:getting-started/constraints.adoc[]

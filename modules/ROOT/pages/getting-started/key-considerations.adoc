@@ -1,0 +1,40 @@
+[[key-considerations]]
+= Key considerations
+
+== Disk size
+
+Enabling change data capture on a database causes more data to be written into transaction log files.
+This means that the log files are rotated more frequently and log pruning is activated sooner (based on your configuration).
+The disk may run out of space if the disk size for transaction log storage is limited.
+Please ensure that you have plenty of available space.
+
+[IMPORTANT]
+====
+Please allow for a 50% increase in data written to the transaction log with `DIFF` log enrichment mode, and 75% for `FULL` log enrichment mode.
+Actual disk usage depends on the application, data model and transaction characteristics.
+The impact on log growth should be evaluated during the EAP.
+====
+
+== Using CDC with existing databases
+
+You can enable log enrichment on existing databases in order to be able to track changes on existing data.
+However, enabling log enrichment affects only future transactions and existing data is not covered by CDC procedures.
+If your use case requires a snapshot of existing data for CDC purposes, best practice is to;
+
+* Enable log enrichment with one of the desired values
+* Set database to read-only
+* Capture current change identifier
+* Perform a snapshot using an application of your own that reads all nodes and relationships of interest and process those according to your CDC requirements
+* Set database to read-write
+* Run your CDC application starting with the captured change identifier
+
+[[log-retention]]
+== Transaction log retention
+
+Since Neo4j stores change data capture information inside transaction log entries, it is important that you configure your transaction log retention period based on your requirements.
+It is recommended to configure the `db.tx_log.rotation.retention_policy` setting using temporal types, such as `hours` or `days`.
+
+
+The number of hours or days to keep transaction logs is highly dependent on your CDC use case, but as a general rule of thumb you can pick the period based on downtime tolerance of your downstream application so that the changes you have not yet processed are not pruned.
+
+For more details on transaction log retention and how to configure it, see link:{neo4j-docs-base-uri}/operations-manual/{page-version}/configuration/transaction-logs/#transaction-logging-log-retention[Operations Manual -> Configuration -> Transaction Log].

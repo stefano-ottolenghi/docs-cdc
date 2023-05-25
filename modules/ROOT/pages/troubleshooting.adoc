@@ -1,0 +1,23 @@
+[[troubleshooting]]
+= Troubleshooting
+:description: This chapter describes common change data capture related errors.
+
+You can find a list of error codes and causes that are used by change data capture procedures.
+
+== Error codes
+
+=== Neo.DatabaseError.ChangeDataCapture.Disabled
+
+Change data capture is currently disabled for this database.
+You need to enable xref:getting-started/enrichment-mode.adoc[log enrichment] to make use of change data capture procedures.
+
+=== Neo.DatabaseError.ChangeDataCapture.ScanFailure
+
+We cannot find the transaction log entry for the change identifier provided.
+This is likely because of your xref:getting-started/key-considerations.adoc#log-retention[log retention] settings.
+Please review your settings and increase the log retention period to fit your requirements.
+
+=== Neo.ClientError.ChangeDataCapture.InvalidIdentifier
+
+The change identifier provided is either invalid or generated for another database.
+Verify that the change identifier you've provided is acquired from either of xref:procedures/earliest.adoc[cdc.earliest], xref:procedures/current.adoc[cdc.current] or xref:procedures/query.adoc[cdc.query] procedures for this database.

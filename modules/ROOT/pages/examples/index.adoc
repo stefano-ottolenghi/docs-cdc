@@ -1,0 +1,10 @@
+= Example usage of change data capture
+
+This section provides a guide on how to implement a simple utility application that makes use of change data capture procedures.
+The examples are provided separately for each of the supported drivers.
+
+* xref:examples/csharp.adoc[C#]
+* xref:examples/go.adoc[Go]
+* xref:examples/java.adoc[Java]
+* xref:examples/js.adoc[Javascript]
+* xref:examples/python.adoc[Python]

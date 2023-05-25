@@ -1,0 +1,91 @@
+= Example CDC usage in Javascript
+
+[source, javascript, role="nocollapse"]
+----
+const neo4j = require('neo4j-driver');
+const yargs = require('yargs/yargs');
+const {hideBin} = require('yargs/helpers');
+const argv = yargs(hideBin(process.argv)).argv;
+const util = require('util');
+
+
+function applyChange(change) { // <1>
+  console.log(util.inspect(change.toObject(), false, null, true));
+}
+
+async function queryChanges(driver, database, cursor, selectors) {
+  const session = driver.session({database: database});
+  try {
+    await session.executeRead((tx) => {
+      return tx.run('CALL cdc.query($from, $selectors)',
+          {from: cursor, selectors: selectors}); // <2>
+    })
+        .then((res) => {
+          res.records.map((change) => {
+            applyChange(change); // <3>
+            cursor = change.get('id'); // <4>
+          });
+        });
+  } catch (e) {
+    console.log('Failed to apply change', e);
+  } finally {
+    session.close();
+  }
+  return cursor;
+}
+
+function queryChangesLoop(driver, database, cursor, selectors) {
+  setTimeout(async () => {
+    cursor = await queryChanges(driver, database, cursor, selectors);
+    queryChangesLoop(driver, database, cursor, selectors);
+  }, 500);
+}
+
+function earliestChangeId(driver, database) { // <5>
+  return driver.executeQuery('CALL cdc.earliest', {}, {database: database})
+      .then((res) => {
+        return res.records[0].get('id');
+      });
+}
+
+function currentChangeId(driver, database) { // <6>
+  return driver.executeQuery('CALL cdc.current', {}, {'database': database})
+      .then((res) => {
+        return res.records[0].get('id');
+      });
+}
+
+
+async function main() {
+  const uri = argv.address ?? argv.a ?? 'neo4j://localhost:7687';
+  const database = argv.database ?? argv.d ?? 'neo4j';
+  const user = argv.user ?? argv.u ?? 'neo4j';
+  const password = argv.password ?? argv.p ?? 'passw0rd';
+  let cursor = argv.from ?? argv.f;
+
+  const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
+
+  if (!cursor) {
+    cursor = await currentChangeId(driver, database);
+  }
+
+  const selectors = [ // <7>
+    // {"select":"n"}
+  ];
+  queryChangesLoop(driver, database, cursor, selectors); // <8>
+
+  // await driver.close() // <9>
+}
+
+main();
+
+----
+<1> This method is called once for each change event. It should be replaced depending on your use case.
+<2> This query fetches the changes from the database.
+<3> Here we call a method once for each change.
+<4> Note that we update the cursor defined outside the anonymous function. `session.executeRead` might re-try the query, re-running the inner anonymous function. In order to avoid re-trying from an already applied cursor position, we need to ensure that further calls to `cdc.query` are executed with the new cursor value.
+<5> Use this function to get the earliest available change id.
+<6> Use this function to get the current change id.
+<7> Here you can limit the returned changes. The out-commented line would select only node changes and exclude all relationship changes.
+<8> We call `queryChanges` repeatedly, using the cursor from the previous call.
+<9> Call `driver.close()` when you want to terminate the loop.

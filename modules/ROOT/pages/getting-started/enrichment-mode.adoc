@@ -1,0 +1,90 @@
+[[enrichment-mode]]
+= Enrichment mode
+
+Neo4j extracts change data capture information from transaction logs.
+Transaction logs by default do not contain any directly usable change data capture information, and the amount of change data to be captured is controlled by a new database level option named as transaction log enrichment mode.
+
+== Available enrichment modes
+
+Neo4j offers three levels of transaction log enrichment: `OFF`, `DIFF` and `FULL`.
+For change data capture procedures to work, the level of enrichment must be either `DIFF` or `FULL`.
+The enrichment level is set on each database and defaults to `OFF`.
+
+=== `OFF`
+With enrichment mode set to `OFF`, no additional data is written to the transaction log and change data capture is disabled.
+
+=== `DIFF`
+With enrichment mode set to `DIFF`, changes are captured as the difference between before and after states of each changed entity.
+
+=== `FULL`
+With enrichment mode set to `FULL`, changes are recorded as a complete copy of the before and after states of each changed entity.
+
+On databases with `FULL` enrichment mode, The `event.state.before` and `event.state.after` fields contain the complete before and after state.
+With `DIFF` mode they only contain removals, updates and additions.
+For more details on the output schema see xref:procedures/output-schema.adoc[].
+
+== Modifying enrichment mode
+
+=== Creating a database with log enrichment enabled
+
+This provides a way to bootstrap a new database with log enrichment set as `FULL`.
+For `DIFF` log enrichment mode, replace `FULL` with `DIFF`.
+
+[NOTE]
+====
+Note that default log enrichment mode is `OFF` and change data capture is disabled until it is set as `DIFF` or `FULL`.
+====
+
+.Query
+[source, cypher]
+----
+CREATE DATABASE name OPTIONS {txLogEnrichment: "FULL"}
+----
+
+=== Modifying a database's log enrichment mode
+
+Log enrichment mode can also be set on an existing database.
+For `FULL` log enrichment mode, replace `DIFF` with `FULL`.
+
+.Query
+[source, cypher]
+----
+ALTER DATABASE name SET OPTION txLogEnrichment "DIFF"
+----
+
+[IMPORTANT]
+====
+Modifying enrichment mode from `DIFF` to `FULL` or vice versa is fine, but be aware that the captured change data immediately reflects the new enrichment mode.
+Your CDC application must be able to deal with these changes.
+
+Enrichment mode is reflected in the output from change data capture procedures.
+====
+
+=== Disabling log enrichment
+
+Log enrichment can be disabled on an existing database, either by setting the option explicitly to `OFF` or removing the option.
+
+.Using set option clause
+[source, cypher]
+----
+ALTER DATABASE name SET OPTION txLogEnrichment "OFF"
+----
+
+.Using remove option clause
+[source, cypher]
+----
+ALTER DATABASE name REMOVE OPTION txLogEnrichment
+----
+
+[WARNING]
+====
+Disabling enrichment immediately breaks the continuity of change events.
+Regular change identifiers generated before this point can no longer be used.
+Even if enrichment is re-enabled, the previously generated change identifiers remain invalid.
+
+After re-enabling enrichment, using outdated identifiers will lead to exceptions or inconsistent results.
+The xref:procedures/current.adoc[cdc.current] or xref:procedures/earliest.adoc[cdc.earliest] procedures should be used to acquire a new starting point.
+
+Note that the identifiers returned by xref:procedures/earliest.adoc[cdc.earliest] has a special behaviour.
+The generated earliest change identifier will always point to the earliest transaction log entry that contains change data capture information, up to the latest time when enrichment was enabled.
+====

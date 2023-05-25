@@ -1,0 +1,41 @@
+[[earliest]]
+= Acquiring the earliest change identifier
+
+The procedure `cdc.earliest` is used to acquire a change identifier for the earliest available change.
+
+.Signature
+[source]
+----
+cdc.earliest() :: (
+    id :: STRING? // <1>
+)
+----
+
+<1> A change identifier that refers to the earliest change available.
+
+Unlike change identifiers returned from `cdc.query` or `cdc.current`, this identifier does not refer to a specific change.
+Instead, it dynamically points to the earliest transaction log entry that contains change data capture information, up to the latest time when enrichment was enabled.
+
+[WARNING]
+====
+Change identifiers are local to the database they are generated for, and cannot be used to query changes on another database.
+You should consider this when restoring a database from a backup, since the restored database is practically a new database.
+====
+
+====
+.Query earliest change identifier
+[source, cypher]
+----
+CALL cdc.earliest()
+----
+
+.Result
+[role="queryresult",options="header,footer",cols="1*<m"]
+|===
+| +id+
+| +"A3V16ZaLlUmnipHLFkWrlA0AAAAAAAAABQAAAAAAAAAA"+
+
+1+d|Rows: 1
+|===
+
+====

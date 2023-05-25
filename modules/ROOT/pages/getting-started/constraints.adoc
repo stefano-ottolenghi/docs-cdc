@@ -1,0 +1,184 @@
+[[change-data-capture-constraints]]
+= Capturing key properties
+
+Neo4j internally identifies nodes and relationships by their internal identifiers.
+Although these internal identifiers are always part of the generated change events, you can also include logical/business keys defined on nodes and relationships in the change events.
+The only requirement for this is to have a corresponding `node key` and `relationship key` constraints defined on labels and relationship types.
+
+[NOTE]
+====
+Note that the `node key` constraint is equivalent to having both `unique node property` and `node property existence` constraints defined on the same property/properties.
+Similarly, the `relationship key` constraint is also equivalent to having both `unique relationship property` and `relationship property existence` constraints defined on the same property/properties.
+====
+
+Having these `key` constraints defined on entities, all of the participating property values are captured as `event.keys` field on node changes and `event.key` field on relationship changes.
+Furthermore, a relationship change also includes the corresponding participating key property values for the relationship's `start` and `end` nodes.
+
+[WARNING]
+====
+If the node or relationship key constraints (and also the equivalents) are added after a change event is captured, the previously captured change events are not updated with key information retroactively.
+The key properties are captured from the point the corresponding constraints are created.
+====
+
+== Node keys
+
+Assume that we have the following constraints for `Person` and `Employee` labels.
+
+.Node key constraint for `Person` label
+[source, cypher]
+----
+CREATE CONSTRAINT person_key IF NOT EXISTS FOR (n:Person) REQUIRE (n.firstName, n.lastName) IS NODE KEY
+----
+
+.Node key constraint for `Employee` label
+[source, cypher]
+----
+CREATE CONSTRAINT employee_key IF NOT EXISTS FOR (n:Employee) REQUIRE (n.id) IS NODE KEY
+----
+
+Whenever a change happens on a node with `Person` label with `firstName` and `lastName` properties set as `john` and `doe` respectively, the change event includes the following key information.
+
+[source, json]
+----
+{
+    //...
+    "event": {
+        "keys": {
+            "Person": {
+                "firstName": "john",
+                "lastName": "doe"
+            }
+        }
+    }
+    //...
+}
+----
+
+Likewise, whenever a change happens on a node with `Employee` label with `id` property set as `1001`, the change event includes the following key information.
+
+[source, json]
+----
+{
+    //...
+    "event": {
+        "keys": {
+            "Employee": {
+                "id": 1001
+            }
+        }
+    }
+    //...
+}
+----
+
+If, on the other hand, the changed node has both `Person` and `Employee` labels with `firstName`, `lastName` and `id` properties set as `john`, `doe` and `1001` respectively, the change event includes the following key information.
+
+[source, json]
+----
+{
+    //...
+    "event": {
+        "keys": {
+            "Person": {
+                "firstName": "john",
+                "lastName": "doe"
+            },
+            "Employee": {
+                "id": 1001
+            }
+        }
+    }
+    //...
+}
+----
+
+For a full description of change record schema, see xref:procedures/output-schema.adoc[].
+
+[NOTE]
+====
+Although the preferred way of specifying node key properties is creating a `node key` constraint, the same can be achieved using both `unique node property` and `node property existence` constraints on the same set of properties.
+
+[source, cypher]
+----
+CREATE CONSTRAINT person_firstName_exists FOR (n:Person) REQUIRE n.firstName IS NOT NULL;
+CREATE CONSTRAINT person_lastName_exists FOR (n:Person) REQUIRE n.lastName IS NOT NULL;
+CREATE CONSTRAINT person_unique FOR (n:Person) REQUIRE (n.firstName, n.lastName) IS UNIQUE;
+----
+====
+
+For details about constraints and syntax of related commands, see link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/constraints[Cypher Manual -> Constraints].
+
+== Relationship keys
+
+Assume that you have the following constraints for `MARRIED_TO` relationship type.
+
+.Relationship key for `MARRIED_TO` type
+[source, cypher]
+----
+CREATE CONSTRAINT married_to_key FOR ()-[r:MARRIED_TO]-() REQUIRE (r.registerId) IS RELATIONSHIP KEY
+----
+
+Whenever a change happens on a relationship of type `MARRIED_TO` with `registerId` property set as `1125`, the change event includes the following key information.
+
+[source, json]
+----
+{
+    //...
+    "event": {
+        "key": {
+            "registerId": 1125
+        }
+    }
+    //...
+}
+----
+
+If the relationship's start and end nodes correspond to nodes with node key constraint, those property values are also included in the change event.
+
+[source, json, role=nocollapse]
+----
+{
+    //...
+    "event": {
+        "start": {
+            "elementId": "<element-id>",
+            "labels": ["Person"],
+            "keys": {
+                "Person": {
+                    "firstName": "john",
+                    "lastName": "doe"
+                }
+            }
+        },
+        "end": {
+            "elementId": "<element-id>",
+            "labels": ["Person"],
+            "keys": {
+                "Person": {
+                    "firstName": "mary",
+                    "lastName": "doe"
+                }
+            }
+        },
+        "key": {
+            "registerId": 1125
+        }
+    }
+    //...
+}
+----
+
+For a full description of change record schema, see xref:procedures/output-schema.adoc[].
+
+[NOTE]
+====
+Although the preferred way of specifying relationship key properties is creating `relationship key` constraint, the same can be achieved using both `unique relationship property` and `relationship property existence` constraints on the same set of properties.
+
+[source, cypher]
+----
+CREATE CONSTRAINT married_to_registerId_exists FOR ()-[r:MARRIED_TO]-() REQUIRE (r.registerId) IS NOT NULL;
+CREATE CONSTRAINT married_to_registerId_unique FOR ()-[r:MARRIED_TO]-() REQUIRE (r.registerId) IS UNIQUE;
+----
+====
+
+For details about constraints and syntax of related commands, see link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/constraints[Cypher Manual -> Constraints].
