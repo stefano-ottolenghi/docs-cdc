@@ -2,62 +2,60 @@
 
 [source, python, role="nocollapse"]
 ----
-from neo4j import GraphDatabase
-from neo4j.time import DateTime
-import sys
 import getopt
-import time
 import json
+import sys
+import time
+from threading import Thread
+
+from neo4j import GraphDatabase
 
 
-def serializeDates(obj):
-    if isinstance(obj, DateTime):
-        return str(obj)
-    else:
-        raise TypeError('Unable to serialse type: {}'.format(type(object)))
+class CDCService:
+    def __init__(self, driver, database, start_cursor=None, selectors=None):
+        self.driver = driver
+        self.database = database
+        self.cursor = start_cursor
+        if self.cursor is None:
+            self.cursor = self.current_change_id()
+        self.selectors = selectors
 
+    def apply_change(self, record): # <1>
+        record_dict = {
+            k: record.get(k)
+            for k in ('id', 'txId', 'seq', 'event', 'metadata')
+        }
+        print(json.dumps(record_dict, indent=2, default=repr))
 
-def apply_change(record): # <1>
-    asDict = {
-        'id': record.get('id'),
-        'txId': record.get('txId'),
-        'seq': record.get('seq'),
-        'event': record.get('event'),
-        'metadata': record.get('metadata')
-    }
-    print(json.dumps(asDict, indent=2, default=serializeDates))
+    def query_changes_query(self, tx):
+        result = tx.run('CALL cdc.query($cursor, $selectors)', # <2>
+                        cursor=self.cursor, selectors=self.selectors)
+        for record in result:
+            try:
+                self.apply_change(record) # <3>
+            except Exception as e:
+                print('Error whilst applying change', e)
+                break
+            self.cursor = record['id'] # <4>
 
+    def query_changes(self):
+        with self.driver.session(database=self.database) as session:
+            session.execute_read(self.query_changes_query)
 
-def query_changes_query(tx, cursorWrapper, selectors):
-    result = tx.run('CALL cdc.query($cursor, $selectors)', # <2>
-                    cursor=cursorWrapper['cursor'], selectors=selectors)
-    for record in result:
-        try:
-            apply_change(record) # <3>
-            cursorWrapper['cursor'] = record['id']
-        except Exception as e:
-            print('Error whilst applying change', e)
-            break
-    return cursorWrapper['cursor']
+    def earliest_change_id(self): # <5>
+        records, _, _ = self.driver.execute_query(
+            'CALL cdc.earliest', database_=self.database)
+        return records[0]['id']
 
+    def current_change_id(self): # <6>
+        records, _, _ = self.driver.execute_query(
+            'CALL cdc.current', database_=self.database)
+        return records[0]['id']
 
-def query_changes(driver, database, cursor, selectors):
-    cursorWrapper = {'cursor': cursor} # <4>
-    with driver.session(database=database) as session:
-        session.execute_read(query_changes_query, cursorWrapper, selectors)
-    return cursorWrapper['cursor']
-
-
-def earliest_change_id(driver, database): # <5>
-    records, _, _ = driver.execute_query(
-        'CALL cdc.earliest', database=database)
-    return records[0]['id']
-
-
-def current_change_id(driver, database): # <6>
-    records, _, _ = driver.execute_query(
-        'CALL cdc.current', database=database)
-    return records[0]['id']
+    def run(self):
+        while True: # <8>
+            self.query_changes()
+            time.sleep(0.5)
 
 
 def main(argv):
@@ -69,7 +67,8 @@ def main(argv):
     cursor = None
 
     opts, _ = getopt.getopt(
-        argv, 'a:d:u:p:f:', ['address', 'database', 'username', 'password', 'from'])
+        argv, 'a:d:u:p:f:',
+        ['address=', 'database=', 'username=', 'password=', 'from='])
     for opt, arg in opts:
         if opt in ('-a', '--address'):
             address = arg
@@ -82,15 +81,15 @@ def main(argv):
         elif opt in ('-f', '--from'):
             cursor = arg
 
+    selectors = [ # <7>
+        # {'select': 'n'}
+    ]
+
     with GraphDatabase.driver(address, auth=(username, password)) as driver:
-        if cursor == None:
-            cursor = current_change_id(driver, database)
-        selectors = [ # <7>
-            # {'select': 'n'}
-        ]
-        while (True): # <8>
-            cursor = query_changes(driver, database, cursor, selectors)
-            time.sleep(0.5)
+        cdc = CDCService(driver, database, cursor, selectors)
+        cdc_thread = Thread(target=cdc.run, daemon=True)
+        cdc_thread.start()
+        cdc_thread.join()
 
 
 if __name__ == '__main__':
@@ -99,7 +98,7 @@ if __name__ == '__main__':
 <1> This method is called once for each change event. It should be replaced depending on your use case.
 <2> This query fetches the changes from the database.
 <3> Here we call a method once for each change.
-<4> `session.execute_read` may retry `query_changes_query`, for example when there are network issues. Thus `query_changes_query` must be idempotent. We keep it idempotent by updating the cursor as we go. Here we wrap the cursor so that updates to it are not restrained to the inner function context.
+<4> `session.execute_read` may retry `query_changes_query`, for example when there are network issues. Thus `query_changes_query` must be idempotent. We keep it idempotent by updating the cursor as we go.
 <5> Use this function to get the earliest available change id.
 <6> Use this function to get the current change id.
 <7> Here you can limit the returned changes. The out-commented line would select only node changes and exclude all relationship changes.
