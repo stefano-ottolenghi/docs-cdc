@@ -18,8 +18,11 @@
 ** xref:selectors/examples.adoc[]
 
 * xref:examples/index.adoc[]
+** xref:examples/csharp.adoc[C#]
 ** xref:examples/go.adoc[Go]
 ** xref:examples/java.adoc[Java]
+** xref:examples/js.adoc[Javascript]
+** xref:examples/python.adoc[Python]
 
 * xref:troubleshooting.adoc[]
 
