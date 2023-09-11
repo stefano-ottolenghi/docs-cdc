@@ -125,30 +125,6 @@ The relationship start and end node selectors mostly satisfy the regular node se
 The only exception is that you cannot specify `operation` and `changesTo` fields inside relationship start and end node selectors.
 ====
 
-== Metadata selectors
-
-All of the above selectors also support matching based on the metadata associated with a change.
-
-[source, json]
-----
-{
-  "select": "e", // <1>
-  "authenticatedUser": "alice", // <2>
-  "executingUser": "bob", // <3>
-  "txMetadata": { // <4>
-    "property": "value",
-    "otherProperty": 42
-  },
-  //...
-}
-----
-All fields except for `select` are optional.
-
-<1> May also be applied to 'n' and 'r' selectors.
-<2> Select changes where the authenticated user matches the value provided.
-<3> Select changes where the executing user matches the value provided.
-<4> Select changes where the transactional metadata key/values match the provided entries.
-
 [[combining-selectors]]
 == Combining selectors
 
