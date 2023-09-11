@@ -49,6 +49,39 @@ CALL cdc.query($previousChangeId, [{
 }])
 ----
 
+== Selecting entities based on change metadata
+Changes can be filtered to only include those where the transaction was carried out by a particular user or certain metadata property or properties have been associated with that transaction.
+
+.Query entities changed by a particular user
+[source, cypher]
+----
+CALL cdc.query($previousChangeId, [{
+    select: "e",
+    executingUser: "alice"
+}])
+----
+
+.Query nodes changed by a user impersonating another
+[source, cypher]
+----
+CALL cdc.query($previousChangeId, [{
+    select: "n",
+    authenticatedUser: "alice",
+    executingUser: "bob"
+}])
+----
+
+.Query relationships changed when a specific metadata property was set on the transaction
+[source, cypher]
+----
+CALL cdc.query($previousChangeId, [{
+    select: "r",
+    txMetadata: {
+        correlationId: 123456789
+    }
+}])
+----
+
 == Selecting nodes/relationships by element id
 Changes can be filtered to a specific element id.
 This might be useful when you are interested in changes made to a specific node or relationship.

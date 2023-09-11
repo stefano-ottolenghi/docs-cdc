@@ -22,29 +22,32 @@ Change events for nodes follow this schema:
     "connectionType": "bolt", // <9>
     "connectionServer": "127.0.0.1:51316", // <10>
     "txStartTime": "2023-03-03T11:58:30.429Z", // <11>
-    "txCommitTime": "2023-03-03T11:58:30.526Z" // <12>
+    "txCommitTime": "2023-03-03T11:58:30.526Z", // <12>
+    "txMetadata": { // <13>
+      "correlationId": "123456789"
+    }
   },
   "event": {
-    "elementId": "4:b7e35973-0aff-42fa-873b-5de31868cb4a:1", // <13>
-    "keys": { // <14>
-        "userId": "1001",
-        "name": "John",
-        "lastName": "Doe"
+    "elementId": "4:b7e35973-0aff-42fa-873b-5de31868cb4a:1", // <14>
+    "keys": { // <15>
+      "userId": "1001",
+      "name": "John",
+      "lastName": "Doe"
     },
-    "eventType": "n", // <15>
+    "eventType": "n", // <16>
     "state": {
-      "before": null, // <16>
-      "after": { // <17>
-        "properties": { // <18>
+      "before": null, // <17>
+      "after": { // <18>
+        "properties": { // <19>
           "tagline": "Houston, we have a problem.",
           "title": "Apollo 13",
           "released": "1995"
         },
-        "labels": ["MOVIE"] // <19>
+        "labels": ["MOVIE"] // <20>
       }
     },
-    "operation": "c", // <20>
-    "labels": ["MOVIE"] // <21>
+    "operation": "c", // <21>
+    "labels": ["MOVIE"] // <22>
   }
 }
 ----
@@ -67,27 +70,28 @@ See link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/administration/serve
 <10> The server's address (usually IP address and port but might change based on protocol).
 <11> The timestamp when the underlying transaction started.
 <12> The timestamp when the underlying transaction committed.
-<13> The element id of the changed entity (node or relationship).
+<13> The metadata associated with the transaction when the operation was performed.
+<14> The element id of the changed entity (node or relationship).
 See link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/functions/scalar/#functions-elementid[Cypher Manual -> Functions -> Scalar functions] for more information on element ids.
-<14> The keys identifying the changed entity.
+<15> The keys identifying the changed entity.
 Requires specific constraint types defined on entities, see xref:getting-started/constraints.adoc[] for details.
-<15> Type of the changed entity: `n` for nodes and `r` for relationships.
-<16> A map describing the state of the entity before the change.
+<16> Type of the changed entity: `n` for nodes and `r` for relationships.
+<17> A map describing the state of the entity before the change.
 This field is always `NULL` for create events.
 When on `DIFF` enrichment mode, it is limited to the properties and labels of the entity that have changed.
 See xref:getting-started/enrichment-mode.adoc#enrichment-mode[enrichment mode] for details.
 This field always contains the full state of the entity for delete events, regardless of the enrichment mode being set to `DIFF` or `FULL`.
-<17> A map describing the state of the entity after the change.
+<18> A map describing the state of the entity after the change.
 This field is always `NULL` for delete events.
 When on `DIFF` enrichment mode, it is limited to the properties and labels of the entity that have changed.
 See xref:getting-started/enrichment-mode.adoc#enrichment-mode[enrichment mode] for details.
 This field always contains the full state of the entity for create events, regardless of the enrichment mode being set to `DIFF` or `FULL`.
-<18> A map of properties of the entity after the change.
-<19> List of labels of the node after the change has been applied.
+<19> A map of properties of the entity after the change.
+<20> List of labels of the node after the change has been applied.
 When on `DIFF` enrichment mode, it is limited to the changed labels.
 See xref:getting-started/enrichment-mode.adoc#enrichment-mode[enrichment mode] for details.
-<20> Type of the operation: `c` for creates, `u` for updates, and `d` for deletions.
-<21> List of labels of the changed node.
+<21> Type of the operation: `c` for creates, `u` for updates, and `d` for deletions.
+<22> List of labels of the changed node.
 This list is always populated from the `before` state of the node.
 It contains the complete set of labels regardless of the enrichment mode.
 
@@ -111,7 +115,10 @@ Note that only the differences are annotated below.
     "connectionType": "bolt",
     "connectionServer": "127.0.0.1:51186",
     "txStartTime": "2023-03-03T11:54:40.510Z",
-    "txCommitTime": "2023-03-03T11:54:40.773Z"
+    "txCommitTime": "2023-03-03T11:54:40.773Z",
+    "txMetadata": {
+      "correlationId": "987654321"
+    }
   },
   "event": {
     "elementId": "5:6a4af4ff-da3a-49e7-ae71-2c0ac3c1fc1a:0",
