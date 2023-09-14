@@ -2,7 +2,7 @@
 = Selectors
 :description: This chapter describes how to filter captured change data.
 
-`cdc.query` procedure support filtering returned changes using user provided selectors.
+`cdc.unfiltered.query` procedure support filtering returned changes using user provided selectors.
 
 == Selector schema
 
@@ -134,7 +134,7 @@ For example, specifying both `name` and `surname` as a `changesTo` value only re
 .Query changes updating both `name` and `surname` properties
 [source, cypher]
 ----
-CALL cdc.query($previousChangeId, [{select:"n", changesTo:["name", "surname"]}])
+CALL cdc.unfiltered.query($previousChangeId, [{select:"n", changesTo:["name", "surname"]}])
 ----
 
 In order to extract changes for either `name` *or* `surname` properties, two separate selectors have to be specified:
@@ -142,7 +142,7 @@ In order to extract changes for either `name` *or* `surname` properties, two sep
 .Query changes updating either `name` or `surname` properties
 [source, cypher]
 ----
-CALL cdc.query($previousChangeId, [
+CALL cdc.unfiltered.query($previousChangeId, [
     {select:"n", changesTo:["name"]},
     {select:"n", changesTo:["surname"]}
 ])
