@@ -1,5 +1,5 @@
 * xref:index.adoc[]
-
+* xref:changelog.adoc[]
 * xref:getting-started/index.adoc[]
 ** xref:getting-started/key-considerations.adoc[]
 ** xref:getting-started/feature-flag.adoc[]

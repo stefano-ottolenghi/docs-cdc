@@ -1,0 +1,37 @@
+= Changelog
+
+This page lists changes to the Change Data Capture feature in different versions of neo4j.
+
+== Version 5.13
+=== Updated features
+[cols="2", options="header"]
+|===
+| Feature
+| Details
+
+a|
+label:syntax[]
+label:updated[]
+[source, cypher, role="noheader"]
+----
+CALL cdc.unfiltered.query
+----
+a|
+The procedure `cdc.query` is renamed to `cdc.unfiltered.query`. This coincides with removing the admin requirements for running `cdc.current` and `cdc.earliest`. `cdc.unfiltered.query` continues to require admin/boosted privileges.
+|===
+
+== Version 5.10
+=== New features
+[cols="2", options="header"]
+|===
+| Feature
+| Details
+
+a|
+label:functionality[]
+label:new[]
+
+Cluster support
+a|
+CDC is now available in cluster environments
+|===
