@@ -71,7 +71,7 @@ func (s *CDCService) queryChanges(ctx context.Context) error { // <2>
 	session := s.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: s.database})
 
 	_, err := session.ExecuteRead(ctx, func(tx neo4j.ManagedTransaction) (any, error) {
-		result, err := tx.Run(ctx, "CALL cdc.query($from, $selectors)", map[string]any{
+		result, err := tx.Run(ctx, "CALL cdc.unfiltered.query($from, $selectors)", map[string]any{
 			"from":      s.from(),
 			"selectors": s.selectors,
 		})

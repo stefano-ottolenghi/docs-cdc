@@ -53,7 +53,7 @@ class CDCService implements Closeable {
     private synchronized void queryChanges() { // <2>
         try (var session = driver.session(SessionConfig.forDatabase(database))) {
             session.executeRead(tx -> {
-                var result = tx.run(new Query("CALL cdc.query($from, $selectors)", Map.of("from", cursor, "selectors", selectors)));
+                var result = tx.run(new Query("CALL cdc.unfiltered.query($from, $selectors)", Map.of("from", cursor, "selectors", selectors)));
                 while (result.hasNext()) {
                     var change = result.next();
                     applyChange(change); // <3>

@@ -28,7 +28,7 @@ class CDCService:
         print(json.dumps(record_dict, indent=2, default=repr))
 
     def query_changes_query(self, tx):
-        result = tx.run('CALL cdc.query($cursor, $selectors)', # <2>
+        result = tx.run('CALL cdc.unfiltered.query($cursor, $selectors)', # <2>
                         cursor=self.cursor, selectors=self.selectors)
         for record in result:
             try:

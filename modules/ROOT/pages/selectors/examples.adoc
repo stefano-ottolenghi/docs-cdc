@@ -12,7 +12,7 @@ Changes can be filtered to only return creates, updates or deletes, regardless o
 .Query
 [source, cypher]
 ----
-CALL cdc.query($previousChangeId, [{
+CALL cdc.unfiltered.query($previousChangeId, [{
     select: "e", 
     operation: "c"
 }])
@@ -25,7 +25,7 @@ Note that if a list of properties is provided, for the change to be selected, al
 .Query entities where a specific property is changed
 [source, cypher]
 ----
-CALL cdc.query($previousChangeId, [{
+CALL cdc.unfiltered.query($previousChangeId, [{
     select: "e",
     changesTo: ["name"]
 }])
@@ -34,7 +34,7 @@ CALL cdc.query($previousChangeId, [{
 .Query nodes where a specific property is changed
 [source, cypher]
 ----
-CALL cdc.query($previousChangeId, [{
+CALL cdc.unfiltered.query($previousChangeId, [{
     select: "n",
     changesTo: ["name"]
 }])
@@ -43,7 +43,7 @@ CALL cdc.query($previousChangeId, [{
 .Query relationships where a specific property is changed
 [source, cypher]
 ----
-CALL cdc.query($previousChangeId, [{
+CALL cdc.unfiltered.query($previousChangeId, [{
     select: "r",
     changesTo: ["registerId"]
 }])
@@ -57,7 +57,7 @@ See link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/functions/scalar/#fu
 .Query node changes
 [source, cypher]
 ----
-CALL cdc.query($previousChangeId, [{
+CALL cdc.unfiltered.query($previousChangeId, [{
     select: "n",
     elementId: "4:e239be76-c7e8-43d8-aa03-567de592f426:0"
 }])
@@ -66,7 +66,7 @@ CALL cdc.query($previousChangeId, [{
 .Query relationship changes
 [source, cypher]
 ----
-CALL cdc.query($previousChangeId, [{
+CALL cdc.unfiltered.query($previousChangeId, [{
     select: "r",
     elementId: "5:a439fca3-d8b3-35f0-aa49-987fa112f993:0"
 }])
@@ -80,7 +80,7 @@ See xref:getting-started/constraints.adoc[] for details.
 .Query node changes by key
 [source, cypher]
 ----
-CALL cdc.query($previousChangeId, [{
+CALL cdc.unfiltered.query($previousChangeId, [{
     select: "n", 
     key: {
         name: "Kevin", 
@@ -92,7 +92,7 @@ CALL cdc.query($previousChangeId, [{
 .Query relationship changes by key
 [source, cypher]
 ----
-CALL cdc.query($previousChangeId, [{
+CALL cdc.unfiltered.query($previousChangeId, [{
     select: "r", 
     key: {
         registerId: 1001
@@ -111,7 +111,7 @@ Node changes can be filtered to specific labels.
 .Query
 [source, cypher]
 ----
-CALL cdc.query($previousChangeId, [{
+CALL cdc.unfiltered.query($previousChangeId, [{
     select: "n", 
     labels: ["Person", "Actor"]
 }])
@@ -130,7 +130,7 @@ Relationship changes can be filtered to a specific type.
 .Query
 [source, cypher]
 ----
-CALL cdc.query($previousChangeId, [{
+CALL cdc.unfiltered.query($previousChangeId, [{
     select: "r", 
     type: "ACTED_IN"
 }])
@@ -142,7 +142,7 @@ Relationship changes can be selected based on their start and end nodes.
 .Query relationships that has a start node with a specific label
 [source, cypher]
 ----
-CALL cdc.query($previousChangeId, [{
+CALL cdc.unfiltered.query($previousChangeId, [{
     select: "r",
     start: {
         labels: ["Person"]
@@ -153,7 +153,7 @@ CALL cdc.query($previousChangeId, [{
 .Query relationships that is between specific labels
 [source, cypher, role="nocollapse"]
 ----
-CALL cdc.query($previousChangeId, [{
+CALL cdc.unfiltered.query($previousChangeId, [{
     select: "r",
     start: {
         labels: ["Person"]
@@ -167,7 +167,7 @@ CALL cdc.query($previousChangeId, [{
 .Query relationships that is between specific labels and with a specific type
 [source, cypher, role="nocollapse"]
 ----
-CALL cdc.query($previousChangeId, [{
+CALL cdc.unfiltered.query($previousChangeId, [{
     select: "r",
     type: "ACTED_IN",
     start: {
@@ -182,7 +182,7 @@ CALL cdc.query($previousChangeId, [{
 .Query relationships that involves a specific node
 [source, cypher, role="nocollapse"]
 ----
-CALL cdc.query($previousChangeId, [{
+CALL cdc.unfiltered.query($previousChangeId, [{
     select: "r",
     start: {
         labels: ["Person"],
@@ -206,7 +206,7 @@ CALL cdc.query($previousChangeId, [{
 .Query nodes and relationships of specific labels and types
 [source, cypher, role="nocollapse"]
 ----
-CALL cdc.query($previousChangeId, [{
+CALL cdc.unfiltered.query($previousChangeId, [{
     select: "n",
     labels: ["Person"]
 }, {

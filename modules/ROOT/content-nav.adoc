@@ -1,7 +1,8 @@
 * xref:index.adoc[]
-
+* xref:changelog.adoc[]
 * xref:getting-started/index.adoc[]
 ** xref:getting-started/key-considerations.adoc[]
+** xref:getting-started/security.adoc[]
 ** xref:getting-started/feature-flag.adoc[]
 ** xref:getting-started/enrichment-mode.adoc[]
 ** xref:getting-started/constraints.adoc[]
