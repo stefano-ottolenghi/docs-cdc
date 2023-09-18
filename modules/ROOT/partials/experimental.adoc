@@ -1,5 +1,5 @@
 [CAUTION]
 ====
 This feature is experimental and not ready for use in production.
-It is only available as part of an Early Access Program, can go under breaking changes until general availability.
+It is currently available as public beta, and may require breaking changes until general availability.
 ====
