@@ -18,6 +18,27 @@ CALL cdc.unfiltered.query
 ----
 a|
 The procedure `cdc.query` is renamed to `cdc.unfiltered.query`. This coincides with removing the admin requirements for running `cdc.current` and `cdc.earliest`. `cdc.unfiltered.query` continues to require admin/boosted privileges.
+
+a|
+label:functionality[]
+label:new[]
+[source, cypher, role="noheader"]
+----
+CALL cdc.unfiltered.query(selectors=[
+    {
+        select: "e",
+        authenticatedUser: "alice",
+        executingUser: "bob",
+        txMetadata: { specialId: 42 }
+    }
+])
+----
+a|
+The CDC query procedure `cdc.filtered.query` can now use metadata selectors for each of the entity selection types (e,n,r). The 3 options available are:
+
+ - txMetadata: key/value pairs to match on
+ - executingUser: the user that executed the transaction
+ - authenticatedUser: the authenticated user that executed the transaction (may be different to executingUser when performing user impersonation)
 |===
 
 == Version 5.10
