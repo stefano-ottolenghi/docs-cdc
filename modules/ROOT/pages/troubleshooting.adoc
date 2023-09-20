@@ -20,4 +20,4 @@ Please review your settings and increase the log retention period to fit your re
 === Neo.ClientError.ChangeDataCapture.InvalidIdentifier
 
 The change identifier provided is either invalid or generated for another database.
-Verify that the change identifier you've provided is acquired from either of xref:procedures/earliest.adoc[cdc.earliest], xref:procedures/current.adoc[cdc.current] or xref:procedures/query.adoc[cdc.unfiltered.query] procedures for this database.
+Verify that the change identifier you've provided is acquired from either of xref:procedures/earliest.adoc[cdc.earliest], xref:procedures/current.adoc[cdc.current] or xref:procedures/query.adoc[cdc.query] procedures for this database.

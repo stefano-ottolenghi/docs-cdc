@@ -46,7 +46,7 @@ static class Program
             await session.ExecuteReadAsync(async tx =>
             {
                 var from = _from;
-                var result = await tx.RunAsync("CALL cdc.unfiltered.query($from, $selectors)", new
+                var result = await tx.RunAsync("CALL cdc.query($from, $selectors)", new
                 {
                     from,
                     selectors = _selectors,
