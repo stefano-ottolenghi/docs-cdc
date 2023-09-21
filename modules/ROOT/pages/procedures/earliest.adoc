@@ -13,7 +13,7 @@ cdc.earliest() :: (
 
 <1> A change identifier that refers to the earliest change available.
 
-Unlike change identifiers returned from `cdc.unfiltered.query` or `cdc.current`, this identifier does not refer to a specific change.
+Unlike change identifiers returned from `cdc.query` or `cdc.current`, this identifier does not refer to a specific change.
 Instead, it dynamically points to the earliest transaction log entry that contains change data capture information, up to the latest time when enrichment was enabled.
 
 [WARNING]

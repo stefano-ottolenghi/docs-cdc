@@ -10,21 +10,11 @@ This page lists changes to the Change Data Capture feature in different versions
 | Details
 
 a|
-label:syntax[]
-label:updated[]
-[source, cypher, role="noheader"]
-----
-CALL cdc.unfiltered.query
-----
-a|
-The procedure `cdc.query` is renamed to `cdc.unfiltered.query`. This coincides with removing the admin requirements for running `cdc.current` and `cdc.earliest`. `cdc.unfiltered.query` continues to require admin/boosted privileges.
-
-a|
 label:functionality[]
 label:new[]
 [source, cypher, role="noheader"]
 ----
-CALL cdc.unfiltered.query(selectors=[
+CALL cdc.query(selectors=[
     {
         select: "e",
         authenticatedUser: "alice",
