@@ -11,14 +11,6 @@ This page lists changes to the Change Data Capture feature in different versions
 
 a|
 label:functionality[]
-label:updated[]
-
-Feature flag enabled by default
-a|
-The `internal.dbms.change_data_capture` feature flag has been enabled by default and no longer needs to be set by users. Users still need to xref:getting-started/enrichment-mode.adoc[enable transaction log enrichment] for each database that they want to use CDC with.
-
-a|
-label:functionality[]
 label:new[]
 [source, cypher, role="noheader"]
 ----
