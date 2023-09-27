@@ -17,8 +17,8 @@ The impact on log growth should be evaluated during the EAP.
 
 == Using CDC with existing databases
 
-You can enable log enrichment on existing databases in order to be able to track changes on existing data.
-However, enabling log enrichment affects only future transactions and existing data is not covered by CDC procedures.
+You can enable log enrichment on existing databases in order to be able to track changes.
+However, enabling log enrichment affects only future transactions and existing data will not be surfaced by CDC procedures.
 If your use case requires a snapshot of existing data for CDC purposes, best practice is to;
 
 * Enable log enrichment with one of the desired values
