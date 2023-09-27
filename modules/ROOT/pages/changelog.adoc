@@ -1,6 +1,6 @@
 = Changelog
 
-This page lists changes to the Change Data Capture feature in different versions of neo4j.
+This page lists changes to the Change Data Capture feature in different versions of Neo4j.
 
 == Version 5.13
 === Updated features
@@ -24,7 +24,7 @@ CALL cdc.query(selectors=[
 ])
 ----
 a|
-The CDC query procedure `cdc.filtered.query` can now use metadata selectors for each of the entity selection types (e,n,r). The 3 options available are:
+The CDC query procedure `cdc.query` can now use metadata selectors for each of the entity selection types (e,n,r). The 3 options available are:
 
  - txMetadata: key/value pairs to match on
  - executingUser: the user that executed the transaction

@@ -24,5 +24,6 @@
 ** xref:examples/python.adoc[Python]
 
 * xref:troubleshooting.adoc[]
+* xref:known-issues.adoc[]
 
 * xref:changelog.adoc[]

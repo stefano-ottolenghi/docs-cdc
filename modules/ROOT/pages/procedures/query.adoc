@@ -6,7 +6,7 @@ Once all changes have been streamed the query terminates.
 
 [NOTE]
 ====
-Since the transaction logs get pruned regularly, changes are only available for querying as long as they are not pruned.
+Since the transaction logs get pruned regularly, changes are only available for querying as long as they have not been pruned.
 See link:{neo4j-docs-base-uri}/operations-manual/{page-version}/configuration/transaction-logs/#transaction-logging-log-pruning[Operations Manual -> Configuration -> Transaction Log] for more details.
 
 Changes also stop being available if xref:getting-started/enrichment-mode.adoc[enrichment mode] is disabled.

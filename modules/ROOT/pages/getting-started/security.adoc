@@ -2,7 +2,8 @@
 = Security
 :description: Security considerations when using CDC.
 
-CDC returns all changes in the database and is not limited to the entities which a certain user is allowed to access. In order to prevent unauthorized access, the procedure xref:procedures/query.adoc[cdc.query] requires admin privileges.
+CDC returns all changes in the database and is not limited to the entities which a certain user is allowed to access.
+In order to prevent unauthorized access, the procedure xref:procedures/query.adoc[`cdc.query`] requires admin privileges and should be configured for least privilege access.
 
 For a regular user to be able to run `cdc.query`, the user must have been granted execute privileges as well as boosted execute privileges.
 [source, cypher]

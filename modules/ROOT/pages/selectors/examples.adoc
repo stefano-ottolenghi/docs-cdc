@@ -55,7 +55,7 @@ Changes can be filtered to only include those where the transaction was carried 
 .Query entities changed by a particular user
 [source, cypher]
 ----
-CALL cdc.filtered.query($previousChangeId, [{
+CALL cdc.query($previousChangeId, [{
     select: "e",
     executingUser: "alice"
 }])
@@ -64,7 +64,7 @@ CALL cdc.filtered.query($previousChangeId, [{
 .Query nodes changed by a user impersonating another
 [source, cypher]
 ----
-CALL cdc.filtered.query($previousChangeId, [{
+CALL cdc.query($previousChangeId, [{
     select: "n",
     authenticatedUser: "alice",
     executingUser: "bob"
@@ -74,7 +74,7 @@ CALL cdc.filtered.query($previousChangeId, [{
 .Query relationships changed when a specific metadata property was set on the transaction
 [source, cypher]
 ----
-CALL cdc.filtered.query($previousChangeId, [{
+CALL cdc.query($previousChangeId, [{
     select: "r",
     txMetadata: {
         correlationId: 123456789

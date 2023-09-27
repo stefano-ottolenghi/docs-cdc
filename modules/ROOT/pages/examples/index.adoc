@@ -1,4 +1,4 @@
-= Example usage of change data capture
+= Example usage of Change Data Capture
 
 This section provides a guide on how to implement a simple utility application that makes use of change data capture procedures.
 The examples are provided separately for each of the supported drivers.
