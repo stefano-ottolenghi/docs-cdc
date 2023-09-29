@@ -1,22 +1,24 @@
 [[change-data-capture-constraints]]
 = Capturing key properties
 
-Neo4j internally identifies nodes and relationships by their internal identifiers.
-Although these internal identifiers are always part of the generated change events, you can also include logical/business keys defined on nodes and relationships in the change events.
-The only requirement for this is to have a corresponding `node key` and `relationship key` constraints defined on labels and relationship types.
+Neo4j internally identifies nodes and relationships by their link:https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-elementid[elementId].
+Although these internal identifiers are always part of the generated change events, they are not safe to track data out of the scope of a single transaction.
+You should thus define logical/business keys to your graph entities in the form of  link:https://neo4j.com/docs/cypher-manual/current/constraints/examples/#constraints-examples-node-key[_node key constraints_] and link:https://neo4j.com/docs/cypher-manual/current/constraints/examples/#constraints-examples-relationship-key[_relationships key constraints_].
+Properties with node and relationship key constraints are always included in change events as top-level objects.
 
 [NOTE]
 ====
-Note that the `node key` constraint is equivalent to having both `unique node property` and `node property existence` constraints defined on the same property/properties.
-Similarly, the `relationship key` constraint is also equivalent to having both `unique relationship property` and `relationship property existence` constraints defined on the same property/properties.
+Note that _node key_ constraints are equivalent to having both _unique node property_ and _node property existence_ constraints defined on the same properties.
+Similarly, _relationship key_ constraint are equivalent to having both _unique relationship property_ and _relationship property existence_ constraints defined on the same properties. +
+For Change Data Capture, it doesn't matter whether the constraints were created in one way or the other.
 ====
 
-Having these `key` constraints defined on entities, all of the participating property values are captured as `event.keys` field on node changes and `event.key` field on relationship changes.
+If _key_ constraints are defined on graph entities, all of the participating property values are captured as `event.keys` field on node changes and `event.key` field on relationship changes.
 Furthermore, a relationship change also includes the corresponding participating key property values for the relationship's `start` and `end` nodes.
 
 [WARNING]
 ====
-If the node or relationship key constraints (and also the equivalents) are added after a change event is captured, the previously captured change events are not updated with key information retroactively.
+If the or relationship key constraints are added after a change event is captured, the previously captured change events are not updated with key information retroactively.
 The key properties are captured from the point the corresponding constraints are created.
 ====
 
@@ -96,7 +98,7 @@ For a full description of change record schema, see xref:procedures/output-schem
 
 [NOTE]
 ====
-Although the preferred way of specifying node key properties is creating a `node key` constraint, the same can be achieved using both `unique node property` and `node property existence` constraints on the same set of properties.
+Although the preferred way of specifying node key properties is creating a _node key_ constraint, the same can be achieved using both _unique node property_ and _node property existence_ constraints on the same set of properties.
 
 [source, cypher]
 ----
@@ -172,7 +174,7 @@ For a full description of change record schema, see xref:procedures/output-schem
 
 [NOTE]
 ====
-Although the preferred way of specifying relationship key properties is creating `relationship key` constraint, the same can be achieved using both `unique relationship property` and `relationship property existence` constraints on the same set of properties.
+Although the preferred way of specifying relationship key properties is creating _relationship key_ constraint, the same can be achieved using both _unique relationship property_ and _relationship property existence_ constraints on the same set of properties.
 
 [source, cypher]
 ----
