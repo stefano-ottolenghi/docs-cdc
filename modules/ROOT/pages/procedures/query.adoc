@@ -59,7 +59,7 @@ CALL cdc.query("A3V16ZaLlUmnipHLFkWrlA0AAAAAAAAABAAAAAAAAAAA")
 [role="queryresult",options="header,footer",cols="5*<m"]
 |===
 | +id+ | +txId+ | +seq+ | +metadata+ | +event+
-| +"A3V16ZaLlUmnipHLFkWrlA0AAAAAAAAABQAAAAAAAAAA"+ | +4+ | +0+ | +{executingUser: "neo4j", connectionClient: "127.0.0.1:63783", authenticatedUser: "neo4j", captureMode: "DIFF", serverId: "4c453340", connectionType: "bolt", connectionServer: "127.0.0.1:7687", txStartTime: 2023-04-25T07:50:10.250Z, txCommitTime: 2023-04-25T07:50:10.305Z}+ | +{elementId: "4:7575e996-8b95-49a7-8a91-cb1645ab940d:0", keys: {}, eventType: "n", state: {before: NULL, after: {properties: {}, labels: []}}, operation: "c", labels: []}+
+| +"A3V16ZaLlUmnipHLFkWrlA0AAAAAAAAABQAAAAAAAAAA"+ | +4+ | +0+ | +{executingUser: "neo4j", connectionClient: "127.0.0.1:63783", authenticatedUser: "neo4j", captureMode: "DIFF", serverId: "4c453340", databaseId: ""edec6ba8-e82f-4aac-ae41-2725f2357fdd", connectionType: "bolt", connectionServer: "127.0.0.1:7687", txStartTime: 2023-04-25T07:50:10.250Z, txCommitTime: 2023-04-25T07:50:10.305Z}+ | +{elementId: "4:7575e996-8b95-49a7-8a91-cb1645ab940d:0", keys: {}, eventType: "n", state: {before: NULL, after: {properties: {}, labels: []}}, operation: "c", labels: []}+
 
 5+d|Rows: 1
 |===
