@@ -61,13 +61,13 @@ Some transactions, such as system and schema commands, are not recorded in chang
 Note that the order of changes observed in the output does not necessarily correspond to the order of changes applied during the transaction.
 <4> The user that performed this change.
 May be different from `authenticatedUser` when using impersonation.
-See link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/administration/access-control/dbms-administration/#access-control-dbms-administration-impersonation[Cypher Manual -> Administration -> Access Control -> DBMS Administration] for more information on impersonation.
+See link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[Operations Manual -> Authentication and authorization -> Manage privileges -> DBMS privileges] for more information on impersonation.
 <5> The authenticated user when this change was performed.
 <6> The transaction log enrichment mode at the time this change was captured.
 <7> The client's address (usually IP address and port but might change based on protocol).
 <8> The identifier of the server that performed this change.
-See link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/administration/servers/#server-management-show-servers[Cypher Manual -> Administration -> Server management] for more information on servers.
-<9> The database unique ID. See link:{neo4j-docs-base-uri}/https://neo4j.com/docs/cypher-manual/{page-version}/administration/#databases[Cypher Manual -> Administration -> Database management] for more information on managing multiple databases.
+See link:{neo4j-docs-base-uri}/operations-manual/{page-version}/clustering/servers/#_listing_servers[Operations Manual -> Clustering -> Managing servers in a cluster] for more information on servers.
+<9> The database unique ID. See link:{neo4j-docs-base-uri}/operations-manual/{page-version}/database-administration/[Operations Manual -> Database administration] for more information on managing multiple databases.
 <10> The protocol under which the client is connected through.
 <11> The server's address (usually IP address and port but might change based on protocol).
 <12> The timestamp when the underlying transaction started.
