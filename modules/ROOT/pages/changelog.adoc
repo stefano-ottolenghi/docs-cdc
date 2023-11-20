@@ -2,6 +2,83 @@
 
 This page lists changes to the Change Data Capture feature in different versions of Neo4j.
 
+== Version 5.15
+=== Updated features
+[cols="2", options="header"]
+|===
+| Feature
+| Details
+
+a|
+label:functionality[]
+label:new[]
+
+Updated details around logical keys in node entities to handle multiple key constraints on the same label
+a|
+The structure for node keys has changed from
+[source, json, role="noheader"]
+----
+{
+  "keys": {
+    "Person": {
+      "prop1" : 1,
+      "prop2" : 2.0,
+      "prop3" : "3"
+    }
+  }
+}
+----
+to
+[source, json, role="noheader"]
+----
+{
+  "keys": {
+    "Person": [
+      {
+        "prop1" : 1,
+        "prop2" : 2.0
+      },
+      {
+        "prop3" : "3"
+      }
+    ]
+  }
+}
+----
+a|
+label:functionality[]
+label:new[]
+
+Updated details around logical keys in relationship entities to handle multiple key constraints on the same type
+a|
+The structure for node keys has changed from
+[source, json, role="noheader"]
+----
+{
+  "keys": {
+    "prop1" : 1,
+    "prop2" : 2.0,
+    "prop3" : "3"
+  }
+}
+----
+to
+[source, json, role="noheader"]
+----
+{
+  "keys": [
+    {
+      "prop1" : 1
+    },
+    {
+      "prop2" : 2.0,
+      "prop3" : "3"
+    }
+  ]
+}
+----
+|===
+
 == Version 5.13
 === Updated features
 [cols="2", options="header"]

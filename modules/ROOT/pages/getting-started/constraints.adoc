@@ -13,12 +13,12 @@ Similarly, _relationship key_ constraint are equivalent to having both _unique r
 For Change Data Capture, it doesn't matter whether the constraints were created in one way or the other.
 ====
 
-If _key_ constraints are defined on graph entities, all of the participating property values are captured as `event.keys` field on node changes and `event.key` field on relationship changes.
+If _key_ constraints are defined on graph entities, all of the participating property values are captured as `event.keys` field on node changes and relationship changes.
 Furthermore, a relationship change also includes the corresponding participating key property values for the relationship's `start` and `end` nodes.
 
 [WARNING]
 ====
-If the or relationship key constraints are added after a change event is captured, the previously captured change events are not updated with key information retroactively.
+If the node or relationship key constraints are added after a change event is captured, the previously captured change events are not updated with key information retroactively.
 The key properties are captured from the point the corresponding constraints are created.
 ====
 
@@ -26,10 +26,11 @@ The key properties are captured from the point the corresponding constraints are
 
 Assume that we have the following constraints for `Person` and `Employee` labels.
 
-.Node key constraint for `Person` label
+.Node key constraints for `Person` label
 [source, cypher]
 ----
-CREATE CONSTRAINT person_key IF NOT EXISTS FOR (n:Person) REQUIRE (n.firstName, n.lastName) IS NODE KEY
+CREATE CONSTRAINT person_names_key IF NOT EXISTS FOR (n:Person) REQUIRE (n.firstName, n.lastName) IS NODE KEY
+CREATE CONSTRAINT person_ssn_key IF NOT EXISTS FOR (n:Person) REQUIRE (n.ssn) IS NODE KEY
 ----
 
 .Node key constraint for `Employee` label
@@ -38,7 +39,7 @@ CREATE CONSTRAINT person_key IF NOT EXISTS FOR (n:Person) REQUIRE (n.firstName, 
 CREATE CONSTRAINT employee_key IF NOT EXISTS FOR (n:Employee) REQUIRE (n.id) IS NODE KEY
 ----
 
-Whenever a change happens on a node with `Person` label with `firstName` and `lastName` properties set as `john` and `doe` respectively, the change event includes the following key information.
+Whenever a change happens on a node with `Person` label with `firstName`, `lastName` and `ssn` properties set as `john`, `doe` and `X123456` respectively, the change event includes the following key information.
 
 [source, json]
 ----
@@ -46,10 +47,15 @@ Whenever a change happens on a node with `Person` label with `firstName` and `la
     //...
     "event": {
         "keys": {
-            "Person": {
-                "firstName": "john",
-                "lastName": "doe"
-            }
+            "Person": [
+                {
+                    "firstName": "john",
+                    "lastName": "doe"
+                },
+                {
+                    "ssn": "X123456"
+                }
+            ]
         }
     }
     //...
@@ -64,16 +70,18 @@ Likewise, whenever a change happens on a node with `Employee` label with `id` pr
     //...
     "event": {
         "keys": {
-            "Employee": {
-                "id": 1001
-            }
+            "Employee": [
+                {
+                    "id": 1001
+                }
+            ]
         }
     }
     //...
 }
 ----
 
-If, on the other hand, the changed node has both `Person` and `Employee` labels with `firstName`, `lastName` and `id` properties set as `john`, `doe` and `1001` respectively, the change event includes the following key information.
+If, on the other hand, the changed node has both `Person` and `Employee` labels with `firstName`, `lastName`, `ssn` and `id` properties set as `john`, `doe`, `Y654321` and `1001` respectively, the change event includes the following key information.
 
 [source, json]
 ----
@@ -81,13 +89,20 @@ If, on the other hand, the changed node has both `Person` and `Employee` labels 
     //...
     "event": {
         "keys": {
-            "Person": {
-                "firstName": "john",
-                "lastName": "doe"
-            },
-            "Employee": {
-                "id": 1001
-            }
+            "Person": [
+                {
+                    "firstName": "john",
+                    "lastName": "doe"
+                },
+                {
+                    "ssn": "Y654321"
+                }
+            ],
+            "Employee": [
+                {
+                    "id": 1001
+                }
+            ]
         }
     }
     //...
@@ -117,19 +132,25 @@ Assume that you have the following constraints for `MARRIED_TO` relationship typ
 .Relationship key for `MARRIED_TO` type
 [source, cypher]
 ----
-CREATE CONSTRAINT married_to_key FOR ()-[r:MARRIED_TO]-() REQUIRE (r.registerId) IS RELATIONSHIP KEY
+CREATE CONSTRAINT married_to_register_key FOR ()-[r:MARRIED_TO]-() REQUIRE (r.registerId) IS RELATIONSHIP KEY
+CREATE CONSTRAINT married_to_official_key FOR ()-[r:MARRIED_TO]-() REQUIRE (r.official) IS RELATIONSHIP KEY
 ----
 
-Whenever a change happens on a relationship of type `MARRIED_TO` with `registerId` property set as `1125`, the change event includes the following key information.
+Whenever a change happens on a relationship of type `MARRIED_TO` with `registerId` and `official` properties set as `1125` and `Alice Roberts` respectively, the change event includes the following key information.
 
 [source, json]
 ----
 {
     //...
     "event": {
-        "key": {
-            "registerId": 1125
-        }
+        "keys": [
+            {
+                "registerId": 1125
+            },
+            {
+                "official": "Alice Roberts"
+            }
+        ]
     }
     //...
 }
@@ -146,25 +167,34 @@ If the relationship's start and end nodes correspond to nodes with node key cons
             "elementId": "<element-id>",
             "labels": ["Person"],
             "keys": {
-                "Person": {
-                    "firstName": "john",
-                    "lastName": "doe"
-                }
+                "Person": [
+                    {
+                        "firstName": "john",
+                        "lastName": "doe"
+                    }
+                ]
             }
         },
         "end": {
             "elementId": "<element-id>",
             "labels": ["Person"],
             "keys": {
-                "Person": {
-                    "firstName": "mary",
-                    "lastName": "doe"
-                }
+                "Person": [
+                    {
+                        "firstName": "mary",
+                        "lastName": "doe"
+                    }
+                ]
             }
         },
-        "key": {
-            "registerId": 1125
-        }
+        "keys": [
+            {
+                "registerId": 1125
+            },
+            {
+                "official": "Alice Roberts"
+            }
+        ]
     }
     //...
 }
