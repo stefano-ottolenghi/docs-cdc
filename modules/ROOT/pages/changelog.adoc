@@ -8,7 +8,20 @@ This page lists changes to the Change Data Capture feature in different versions
 |===
 | Feature
 | Details
+a|
+label:functionality[]
+label:fix[]
 
+Label selectors can match on *either* the _BEFORE_ or _AFTER_ state
+a|
+Change selectors were evaluated against the state of the changed entity as it was _BEFORE_ the change was applied. It is now evaluated on *either* the _BEFORE_ or _AFTER_ state.
+
+As an example, the following change will be returned when using the either of the selectors `{select:n, labels:[OldLabel]}` or `{select:n, labels:[NewLabel]}`
+
+[code, cypher]
+----
+MATCH (n:OldLabel) SET n:NewLabel REMOVE n:OldLabel
+----
 a|
 label:functionality[]
 label:new[]

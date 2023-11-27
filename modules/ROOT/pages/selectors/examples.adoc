@@ -152,7 +152,7 @@ CALL cdc.query($previousChangeId, [{
 
 [NOTE]
 ====
-The query above only returns changes on nodes that have *both* labels.
+The query above only returns changes on nodes that have *both* labels either before or after the change.
 In order to get changes on nodes with either label, two separate selectors have to be specified.
 See xref:selectors/index.adoc#combining-selectors[combining selectors] for details.
 ====
