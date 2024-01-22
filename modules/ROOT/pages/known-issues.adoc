@@ -4,3 +4,26 @@
 
 == Neo4j 5.15
 As of Neo4j 5.15 the CDC feature has the following known issues.
+
+== Neo4j 5.13
+As of Neo4j 5.13 the CDC feature has the following known issues.
+
+=== Entity keys
+Neo4j permits multiple `KEY` constraints on any given label.
+CDC does not distinguish between separate keys per node label/relationship type and merges the properties from each key constraint into one map.
+This may lead to unexpected behaviour around selecting changes by node or relationship key.
+
+The API may change during Beta to resolve this issue.
+
+=== Selector behaviour
+In Neo4j 5.13, change selectors are evaluated against the state of the changed entity as it was _before_ the change was applied.
+This may lead to unexpected behaviour when selecting changes based on properties that have changed.
+
+As an example, the following change would not be returned when using the selector `{select:n, labels:[NewLabel]}`
+
+[code, cypher]
+----
+MATCH (n:OldLabel) SET n:NewLabel REMOVE n:OldLabel
+----
+
+The behaviour may change during Beta to evaluate the selector against a combination of `before` and `after` states.
