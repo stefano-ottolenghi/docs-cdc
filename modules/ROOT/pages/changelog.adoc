@@ -2,6 +2,19 @@
 
 This page lists changes to the Change Data Capture feature in different versions of Neo4j.
 
+== Version 5.17
+=== Bug fixes
+[cols="2", options="header"]
+|===
+| Fix
+| Details
+
+a|
+Missing _BEFORE_ state changes in *FULL* mode
+a|
+In *FULL* mode, when updating a node that was _also_ part of either a new or deleted relationship change, the _BEFORE_ state for that entity did not contain all the node's properties - only the logical key properties.
+|===
+
 == Version 5.15
 === Updated features
 [cols="2", options="header"]
