@@ -17,7 +17,7 @@ async function queryChanges(driver, database, cursor, selectors) {
   const session = driver.session({database: database});
   try {
     await session.executeRead((tx) => {
-      return tx.run('CALL cdc.query($from, $selectors)',
+      return tx.run('CALL db.cdc.query($from, $selectors)',
           {from: cursor, selectors: selectors}); // <2>
     })
         .then((res) => {
@@ -42,14 +42,14 @@ function queryChangesLoop(driver, database, cursor, selectors) {
 }
 
 function earliestChangeId(driver, database) { // <5>
-  return driver.executeQuery('CALL cdc.earliest', {}, {database: database})
+  return driver.executeQuery('CALL db.cdc.earliest', {}, {database: database})
       .then((res) => {
         return res.records[0].get('id');
       });
 }
 
 function currentChangeId(driver, database) { // <6>
-  return driver.executeQuery('CALL cdc.current', {}, {'database': database})
+  return driver.executeQuery('CALL db.cdc.current', {}, {'database': database})
       .then((res) => {
         return res.records[0].get('id');
       });
@@ -83,7 +83,7 @@ main();
 <1> This method is called once for each change event. It should be replaced depending on your use case.
 <2> This query fetches the changes from the database.
 <3> Here we call a method once for each change.
-<4> Note that we update the cursor defined outside the anonymous function. `session.executeRead` might re-try the query, re-running the inner anonymous function. In order to avoid re-trying from an already applied cursor position, we need to ensure that further calls to `cdc.query` are executed with the new cursor value.
+<4> Note that we update the cursor defined outside the anonymous function. `session.executeRead` might re-try the query, re-running the inner anonymous function. In order to avoid re-trying from an already applied cursor position, we need to ensure that further calls to `db.cdc.query` are executed with the new cursor value.
 <5> Use this function to get the earliest available change id.
 <6> Use this function to get the current change id.
 <7> Here you can limit the returned changes. The out-commented line would select only node changes and exclude all relationship changes.

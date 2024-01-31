@@ -3,6 +3,24 @@
 This page lists changes to the Change Data Capture feature in different versions of Neo4j.
 
 == Version 5.17
+=== New features
+[cols="2", options="header"]
+|===
+| Feature
+| Details
+
+a|
+label:functionality[]
+label:new[]
+
+Procedures names have moved into database namespace
+a|
+The procedure names have been updated as follows:
+
+ - *cdc.earliest* becomes *db.cdc.earliest*
+ - *cdc.current* becomes *db.cdc.current*
+ - *cdc.query* becomes *db.cdc.query*
+|===
 === Bug fixes
 [cols="2", options="header"]
 |===

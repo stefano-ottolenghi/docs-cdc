@@ -28,7 +28,7 @@ class CDCService:
         print(json.dumps(record_dict, indent=2, default=repr))
 
     def query_changes_query(self, tx):
-        result = tx.run('CALL cdc.query($cursor, $selectors)', # <2>
+        result = tx.run('CALL db.cdc.query($cursor, $selectors)', # <2>
                         cursor=self.cursor, selectors=self.selectors)
         for record in result:
             try:
@@ -44,12 +44,12 @@ class CDCService:
 
     def earliest_change_id(self): # <5>
         records, _, _ = self.driver.execute_query(
-            'CALL cdc.earliest', database_=self.database)
+            'CALL db.cdc.earliest', database_=self.database)
         return records[0]['id']
 
     def current_change_id(self): # <6>
         records, _, _ = self.driver.execute_query(
-            'CALL cdc.current', database_=self.database)
+            'CALL db.cdc.current', database_=self.database)
         return records[0]['id']
 
     def run(self):

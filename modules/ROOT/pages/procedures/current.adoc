@@ -1,13 +1,13 @@
 [[current]]
 = Acquiring the current change identifier
 
-The procedure `cdc.current` is used to acquire a change identifier for the last committed transaction.
+The procedure `db.cdc.current` is used to acquire a change identifier for the last committed transaction.
 Note that the returned identifier is exclusive, and does not include the changes that happened in the transaction it points to.
 
 .Signature
 [source]
 ----
-cdc.current() :: (
+db.cdc.current() :: (
     id :: STRING? // <1>
 )
 ----
@@ -24,7 +24,7 @@ You should consider this when restoring a database from a backup, since the rest
 .Query current change identifier
 [source, cypher]
 ----
-CALL cdc.current()
+CALL db.cdc.current()
 ----
 
 .Result

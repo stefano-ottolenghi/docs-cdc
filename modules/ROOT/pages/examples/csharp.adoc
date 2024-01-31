@@ -46,7 +46,7 @@ static class Program
             await session.ExecuteReadAsync(async tx =>
             {
                 var from = _from;
-                var result = await tx.RunAsync("CALL cdc.query($from, $selectors)", new
+                var result = await tx.RunAsync("CALL db.cdc.query($from, $selectors)", new
                 {
                     from,
                     selectors = _selectors,
@@ -74,7 +74,7 @@ static class Program
         private async Task<string> EarliestChangeId() // <5>
         {
             var response = await _driver
-                .ExecutableQuery("CALL cdc.earliest")
+                .ExecutableQuery("CALL db.cdc.earliest")
                 .WithMap(record => record["id"].As<string>())
                 .ExecuteAsync();
 
@@ -84,7 +84,7 @@ static class Program
         private async Task<string> CurrentChangeId() // <6>
         {
             var response = await _driver
-                .ExecutableQuery("CALL cdc.current")
+                .ExecutableQuery("CALL db.cdc.current")
                 .WithMap(record => record["id"].As<string>())
                 .ExecuteAsync();
 

@@ -3,13 +3,13 @@
 :description: Security considerations when using CDC.
 
 CDC returns all changes in the database and is not limited to the entities which a certain user is allowed to access.
-In order to prevent unauthorized access, the procedure xref:procedures/query.adoc[`cdc.query`] requires admin privileges and should be configured for least privilege access.
+In order to prevent unauthorized access, the procedure xref:procedures/query.adoc[`db.cdc.query`] requires admin privileges and should be configured for least privilege access.
 
-For a regular user to be able to run `cdc.query`, the user must have been granted execute privileges as well as boosted execute privileges.
+For a regular user to be able to run `db.cdc.query`, the user must have been granted execute privileges as well as boosted execute privileges.
 [source, cypher]
 ----
-GRANT EXECUTE PROCEDURE cdc.query ON DBMS TO $role
-GRANT EXECUTE BOOSTED PROCEDURE cdc.query ON DBMS TO $role
+GRANT EXECUTE PROCEDURE db.cdc.query ON DBMS TO $role
+GRANT EXECUTE BOOSTED PROCEDURE db.cdc.query ON DBMS TO $role
 ----
 
 [NOTE]
@@ -27,6 +27,6 @@ GRANT ACCESS ON DATABASE $database TO $role
 Usually The `PUBLIC` role already has access to the default database.
 ====
 
-The procedures xref:procedures/current.adoc[cdc.current] and xref:procedures/earliest.adoc[cdc.earliest] do not require admin privileges. In order to execute these, access to the database and regular execution privileges are sufficient.
+The procedures xref:procedures/current.adoc[db.cdc.current] and xref:procedures/earliest.adoc[db.cdc.earliest] do not require admin privileges. In order to execute these, access to the database and regular execution privileges are sufficient.
 
 For more details regarding procedure privileges in Neo4j, see link:{neo4j-docs-base-uri}/operations-manual/{page-version}/authentication-authorization/manage-execute-permissions[Operations Manual -> Manage procedure and user-defined function permissions].
