@@ -2,6 +2,127 @@
 
 This page lists changes to the Change Data Capture feature in different versions of Neo4j.
 
+== Version 5.17
+=== New features
+[cols="2", options="header"]
+|===
+| Feature
+| Details
+
+a|
+label:functionality[]
+label:new[]
+
+Procedures names have moved into database namespace
+a|
+The procedure names have been updated as follows:
+
+ - *cdc.earliest* becomes *db.cdc.earliest*
+ - *cdc.current* becomes *db.cdc.current*
+ - *cdc.query* becomes *db.cdc.query*
+|===
+=== Bug fixes
+[cols="2", options="header"]
+|===
+| Fix
+| Details
+
+a|
+Missing _BEFORE_ state changes in *FULL* mode
+a|
+In *FULL* mode, when updating a node that was _also_ part of either a new or deleted relationship change, the _BEFORE_ state for that entity did not contain all the node's properties - only the logical key properties.
+|===
+
+== Version 5.15
+=== Updated features
+[cols="2", options="header"]
+|===
+| Feature
+| Details
+a|
+label:functionality[]
+label:fix[]
+
+Label selectors can match on *either* the _BEFORE_ or _AFTER_ state
+a|
+Change selectors were evaluated against the state of the changed entity as it was _BEFORE_ the change was applied. It is now evaluated on *either* the _BEFORE_ or _AFTER_ state.
+
+As an example, the following change will be returned when using the either of the selectors `{select:n, labels:[OldLabel]}` or `{select:n, labels:[NewLabel]}`
+
+[code, cypher]
+----
+MATCH (n:OldLabel) SET n:NewLabel REMOVE n:OldLabel
+----
+a|
+label:functionality[]
+label:new[]
+
+Updated details around logical keys in node entities to handle multiple key constraints on the same label
+a|
+The structure for node keys has changed from
+[source, json, role="noheader"]
+----
+{
+  "keys": {
+    "Person": {
+      "prop1" : 1,
+      "prop2" : 2.0,
+      "prop3" : "3"
+    }
+  }
+}
+----
+to
+[source, json, role="noheader"]
+----
+{
+  "keys": {
+    "Person": [
+      {
+        "prop1" : 1,
+        "prop2" : 2.0
+      },
+      {
+        "prop3" : "3"
+      }
+    ]
+  }
+}
+----
+a|
+label:functionality[]
+label:new[]
+
+Updated details around logical keys in relationship entities to handle multiple key constraints on the same type
+a|
+The structure for node keys has changed from
+[source, json, role="noheader"]
+----
+{
+  "keys": {
+    "prop1" : 1,
+    "prop2" : 2.0,
+    "prop3" : "3"
+  }
+}
+----
+to
+[source, json, role="noheader"]
+----
+{
+  "keys": [
+    {
+      "prop1" : 1
+    },
+    {
+      "prop2" : 2.0,
+      "prop3" : "3"
+    }
+  ]
+}
+----
+|===
+
 == Version 5.13
 === Updated features
 [cols="2", options="header"]

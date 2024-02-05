@@ -83,8 +83,8 @@ Regular change identifiers generated before this point can no longer be used.
 Even if enrichment is re-enabled, the previously generated change identifiers remain invalid.
 
 After re-enabling enrichment, using outdated identifiers will lead to exceptions or inconsistent results.
-The xref:procedures/current.adoc[cdc.current] or xref:procedures/earliest.adoc[cdc.earliest] procedures should be used to acquire a new starting point.
+The xref:procedures/current.adoc[db.cdc.current] or xref:procedures/earliest.adoc[db.cdc.earliest] procedures should be used to acquire a new starting point.
 
-Note that the identifiers returned by xref:procedures/earliest.adoc[cdc.earliest] has a special behaviour.
+Note that the identifiers returned by xref:procedures/earliest.adoc[db.cdc.earliest] has a special behaviour.
 The generated earliest change identifier will always point to the earliest transaction log entry that contains change data capture information, up to the latest time when enrichment was enabled.
 ====

@@ -1,7 +1,7 @@
 [[change-data-capture-querying-changes]]
 = Querying changes
 
-The procedure `cdc.query` is used to query the database for captured changes.
+The procedure `db.cdc.query` is used to query the database for captured changes.
 Once all changes have been streamed the query terminates.
 
 [NOTE]
@@ -16,7 +16,7 @@ Even if enabled again, it is not possible to query the previous change records.
 .Signature
 [source]
 ----
-cdc.query(
+db.cdc.query(
     from =  :: STRING?, // <1>
     selectors = [] :: LIST? OF MAP? // <2>
 ) :: (
@@ -28,10 +28,10 @@ cdc.query(
 ) 
 ----
 
-<1> The change identifier, either captured from an earlier call to `cdc.query` or from one of `cdc.current` or `cdc.earliest`, to query the captured changes from.
-Default value is `""` (empty string) which is replaced with `cdc.current` implicitly.
+<1> The change identifier, either captured from an earlier call to `db.cdc.query` or from one of `db.cdc.current` or `db.cdc.earliest`, to query the captured changes from.
+Default value is `""` (empty string) which is replaced with `db.cdc.current` implicitly.
 This value is treated as exclusive and the results of the query do not include the change corresponding to this value.
-To get a `from` value for the first iteration, see xref:procedures/current.adoc[cdc.current] and xref:procedures/earliest.adoc[cdc.earliest].
+To get a `from` value for the first iteration, see xref:procedures/current.adoc[db.cdc.current] and xref:procedures/earliest.adoc[db.cdc.earliest].
 <2> An optional list of selectors that could be used to filter out changes.
 Default is an empty list, which means _all_ changes are returned without any filtering taking place.
 See xref:selectors/index.adoc[selectors] for details.
@@ -52,7 +52,7 @@ For a detailed description of change event, see xref:procedures/output-schema.ad
 .Query for changes
 [source, cypher]
 ----
-CALL cdc.query("A3V16ZaLlUmnipHLFkWrlA0AAAAAAAAABAAAAAAAAAAA")
+CALL db.cdc.query("A3V16ZaLlUmnipHLFkWrlA0AAAAAAAAABAAAAAAAAAAA")
 ----
 
 .Result

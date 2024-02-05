@@ -71,7 +71,7 @@ func (s *CDCService) queryChanges(ctx context.Context) error { // <2>
     session := s.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: s.database})
 
     _, err := session.ExecuteRead(ctx, func(tx neo4j.ManagedTransaction) (any, error) {
-        result, err := tx.Run(ctx, "CALL cdc.query($from, $selectors)", map[string]any{
+        result, err := tx.Run(ctx, "CALL db.cdc.query($from, $selectors)", map[string]any{
             "from":      s.from(),
             "selectors": s.selectors,
         })
@@ -103,11 +103,11 @@ func (s *CDCService) queryChanges(ctx context.Context) error { // <2>
 }
 
 func (s *CDCService) earliestChangeID(ctx context.Context) (string, error) { // <5>
-    return queryChangeID(ctx, s.driver, s.database, "CALL cdc.earliest()")
+    return queryChangeID(ctx, s.driver, s.database, "CALL db.cdc.earliest()")
 }
 
 func (s *CDCService) currentChangeID(ctx context.Context) (string, error) { // <6>
-    return queryChangeID(ctx, s.driver, s.database, "CALL cdc.current()")
+    return queryChangeID(ctx, s.driver, s.database, "CALL db.cdc.current()")
 }
 
 func (s *CDCService) from() string {

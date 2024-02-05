@@ -31,9 +31,20 @@ Change events for nodes follow this schema:
   "event": {
     "elementId": "4:b7e35973-0aff-42fa-873b-5de31868cb4a:1", // <15>
     "keys": { // <16>
-      "userId": "1001",
-      "name": "John",
-      "lastName": "Doe"
+      "Person": [
+        {
+          "firstName": "john",
+          "lastName": "doe"
+        },
+        {
+          "ssn": "Y654321"
+        }
+      ],
+      "Employee": [
+        {
+          "id": 1001
+        }
+      ]
     },
     "eventType": "n", // <17>
     "state": {
@@ -149,7 +160,14 @@ Note that only the differences are annotated below.
     },
     "type": "ACTED_IN", // <7>
     "operation": "c",
-    "key": {}
+    "keys": [ // <8>
+      {
+        "registerId": 1125
+      },
+      {
+        "official": "Alice Roberts"
+      }
+    ]
   }
 }
 ----
@@ -160,3 +178,5 @@ Note that only the differences are annotated below.
 <5> Same set of information defined above for the end node.
 <6> Since relationships do not have labels, there is no field for labels in the before / after state.
 <7> Relationship type.
+<8> The keys identifying the changed entity.
+Requires specific constraint types defined on entities, see xref:getting-started/constraints.adoc[] for details.

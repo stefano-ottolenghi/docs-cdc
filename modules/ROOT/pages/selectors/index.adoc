@@ -2,7 +2,7 @@
 = Selectors
 :description: This chapter describes how to filter captured change data.
 
-`cdc.query` procedure support filtering returned changes using user provided selectors.
+`db.cdc.query` procedure support filtering returned changes using user provided selectors.
 
 == Selector schema
 
@@ -55,7 +55,7 @@ Other valid values are `"e"` for all entities and `"r"` for relationships.
 See link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/functions/scalar/#functions-elementid[Cypher Manual -> Functions -> Scalar functions] for more information on element ids.
 <3> Select changes on nodes with matching key properties.
 Key matching is only possible when specific constraints are defined on the node, see xref:getting-started/constraints.adoc[] for details.
-<4> Select changes on nodes which have _all_ of the specified labels.
+<4> Select changes on nodes which have _all_ of the specified labels either before or after the change.
 <5> Select changes which are creating nodes.
 Other valid values are `"u"` for node updates and `"d"` for node deletions.
 <6> Select changes which affect _all_ of the specified properties.
@@ -112,7 +112,7 @@ Specifying `"r"` or `"e"` here will cause an error.
 See link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/functions/scalar/#functions-elementid[Cypher Manual -> Functions -> Scalar functions] for more information on element ids.
 <8> Select relationships where the start node has these key properties.
 Key matching is only possible when specific constraints are defined on the node, see xref:getting-started/constraints.adoc[] for details.
-<9> Select relationships where the start node has these labels.
+<9> Select relationships where the start node has these labels either before or after the change.
 <10> Select relationships with end nodes matching this node selector.
 Same schema as `start`.
 <11> Select changes which are creating relationships.
@@ -158,7 +158,7 @@ For example, specifying both `name` and `surname` as a `changesTo` value only re
 .Query changes updating both `name` and `surname` properties
 [source, cypher]
 ----
-CALL cdc.query($previousChangeId, [{select:"n", changesTo:["name", "surname"]}])
+CALL db.cdc.query($previousChangeId, [{select:"n", changesTo:["name", "surname"]}])
 ----
 
 In order to extract changes for either `name` *or* `surname` properties, two separate selectors have to be specified:
@@ -166,7 +166,7 @@ In order to extract changes for either `name` *or* `surname` properties, two sep
 .Query changes updating either `name` or `surname` properties
 [source, cypher]
 ----
-CALL cdc.query($previousChangeId, [
+CALL db.cdc.query($previousChangeId, [
     {select:"n", changesTo:["name"]},
     {select:"n", changesTo:["surname"]}
 ])

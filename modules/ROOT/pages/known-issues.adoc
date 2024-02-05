@@ -2,25 +2,14 @@
 = Known Issues
 :description: This chapter describes known issues related to CDC.
 
-== Neo4j 5.13
-As of Neo4j 5.13 the CDC feature has the following known issues.
+== Neo4j 5.16
+As of Neo4j 5.16 the CDC feature has the following known issues.
 
-=== Entity keys
-Neo4j permits multiple `KEY` constraints on any given label.
-CDC does not distinguish between separate keys per node label/relationship type and merges the properties from each key constraint into one map.
-This may lead to unexpected behaviour around selecting changes by node or relationship key.
+=== Outdated ChangeId with strict selectors
+Neo4j provides an updated changeId with each change returned through xref:procedures/current.adoc[db.cdc.current]. With selectors filtering out certain changes, xref:procedures/current.adoc[db.cdc.current] might not return any changes and therefore no updated changeId. If the changeId is not updated for long enough it will become invalid and Neo4j will throw an error.
 
-The API may change during Beta to resolve this issue.
+==== Mitigations
+- The issue can be avoided by performing all change filtering on the client side instead of using selectors.
+- The issue can be mitigated by ensuring that provided selectors include enough changes within the timeframe dictated by xref:getting-started/key-considerations.adoc#log-retention[transaction log retention] settings to keep the changeId updated.
 
-=== Selector behaviour
-In Neo4j 5.13, change selectors are evaluated against the state of the changed entity as it was _before_ the change was applied.
-This may lead to unexpected behaviour when selecting changes based on properties that have changed.
-
-As an example, the following change would not be returned when using the selector `{select:n, labels:[NewLabel]}`
-
-[code, cypher]
-----
-MATCH (n:OldLabel) SET n:NewLabel REMOVE n:OldLabel
-----
-
-The behaviour may change during Beta to evaluate the selector against a combination of `before` and `after` states.
+The API is likely to change during Beta to resolve this issue.
