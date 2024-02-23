@@ -20,6 +20,7 @@ Instead, it dynamically points to the earliest transaction log entry that contai
 ====
 Change identifiers are local to the database they are generated for, and cannot be used to query changes on another database.
 You should consider this when restoring a database from a backup, since the restored database is practically a new database.
+See xref:getting-started/key-considerations.adoc#restore-from-backup[restore from backup] for details.
 ====
 
 ====

@@ -15,6 +15,7 @@ Actual disk usage depends on the application, data model and transaction charact
 The impact on log growth should be evaluated during the EAP.
 ====
 
+[#_using_cdc_with_existing_databases]
 == Using CDC with existing databases
 
 You can enable log enrichment on existing databases in order to be able to track changes.
@@ -38,3 +39,65 @@ It is recommended to configure the `db.tx_log.rotation.retention_policy` setting
 The number of hours or days to keep transaction logs is highly dependent on your CDC use case, but as a general rule of thumb you can pick the period based on downtime tolerance of your downstream application so that the changes you have not yet processed are not pruned.
 
 For more details on transaction log retention and how to configure it, see link:{neo4j-docs-base-uri}/operations-manual/{page-version}/configuration/transaction-logs/#transaction-logging-log-retention[Operations Manual -> Configuration -> Transaction Log].
+
+[[restore-from-backup]]
+== Backup and restore operations
+
+[WARNING]
+====
+Restoring your Neo4j database from a backup is likely to cause *loss of data and corrupted data in your CDC application*. 
+Read the following sections carefully if you are using CDC and intend to restore your database from backup.
+====
+=== Loss of change events
+The Neo4j restore procedures replace the existing database with a *new* database.
+This database has a new transaction log and any change identifier (cursor) generated from the old transaction log is not usable with the new database.
+Furthermore, it is essential that the transaction log retention setting of the restored database matches that of your existing database.
+
+The following steps outline how to mitigate this issue:
+
+[NOTE]
+====
+The steps outlined here ensure that all change events are transmitted to your CDC application. 
+Depending on your application, these change events might still be unexpected and cause further issues. 
+See xref:_unexpected_change_events[the following section], before performing these steps.
+====
+
+. *Set the database into read only mode.* +
+This prevents any new changes coming through.
+
+. *Take note of the `txLogEnrichment` value of your database.* +
+The options column of `SHOW DATABASES YIELD name, options` shows the transaction log enrichment value.
+. *Verify that your CDC application is caught up and has consumed all changes in the database.*
+. *Stop your CDC application.*
+. *Restore your database from backup.*
+. *Set the restored database into read-only mode.*
+. *Ensure that the restored database has the same `txLogEnrichment` value as your existing database.* +
+Compare the output of `SHOW DATABASES YIELD name, options` with the value noted in step 2.
+If necessary update the value using the `ALTER DATABASE` command (link:{neo4j-docs-base-uri}/operations-manual/{page-version}/database-administration/standard-databases/manage-databases#alter-database-options[Operations Manual -> Database administration -> Standard databases -> Managing Databases -> Alter database options]).
+. *Restart your CDC application, using xref:procedures/earliest.adoc[db.cdc.earliest] as the starting cursor.*
+. *Enable writes to the restored database.*
+. *Verify that changes are consumed as by your CDC application.*
+
+[#_unexpected_change_events]
+=== Unexpected change events
+When restoring a Neo4j database to a previous snapshot, the changes that have happened since the snapshot was taken are effectively reverted on the database.
+There is no process for letting your CDC application know that these changes 'never happened'.
+New changes on the restored database are changes compared to the state that the database had when the snapshot was taken.
+Effectively, your CDC application expects certain changes to have happened that according to your Neo4j database "never happened".
+
+Some examples of problematic scenarios are:
+
+. *Entities being created 'a second time'* +
+A node/relationship created between the snapshot and restore operation exists in your CDC application but not in the Neo4j database.
+If the node/relationship is (re-)created in your Neo4j database, your CDC application sees a duplicate node/relationship.
+
+. *'Missing' entities* +
+A node/relationship that was dropped between the snapshot and restore operation does not exist in your CDC application but does now exist in the Neo4j database (again).
+If the node/relationship is updated, your CDC application sees an update to a previously deleted entity.
+
+. *Out of sync attributes* +
+Changes on attributes may have been rolled back in the restore operation.
+For example, a `Movie` node in your Neo4j database may have a rating of 5 stars, whereas the latest change that your CDC application consumed changed the rating from 5 stars to 3 stars.
+Which could cause the two systems to treat the node differently.
+
+If your CDC application relies on an internal state it is likely required to restore the state of your CDC application as if it was working with a new database with existing data. For details on this process read the xref:_using_cdc_with_existing_databases[relevant section above].
