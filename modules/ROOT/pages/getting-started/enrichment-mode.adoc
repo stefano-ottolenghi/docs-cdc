@@ -25,7 +25,11 @@ For more details on the output schema see xref:procedures/output-schema.adoc[].
 
 == Modifying enrichment mode
 
-=== Creating a database with log enrichment enabled
+=== Edit CDC enrichment mode from within the Aura Console
+
+View an instance's current CDC enrichment mode by clicking on an instance’s card in the Aura Console dashboard. Enrichment mode is set to OFF by default. 
+
+=== Creating a database with log enrichment enabled using Neo4j DBMS
 
 This provides a way to bootstrap a new database with log enrichment set as `FULL`.
 For `DIFF` log enrichment mode, replace `FULL` with `DIFF`.
