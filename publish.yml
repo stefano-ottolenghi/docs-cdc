@@ -6,8 +6,8 @@ site:
 
 content:
   sources:
-  - url: https://github.com/neo4j/docs-cdc.git
-    branches: ['main']
+  - url: ./
+    branches: ['HEAD']
     exclude:
     - '!**/_includes/*'
     - '!**/readme.adoc'
