@@ -25,20 +25,21 @@ For more details on the output schema see xref:procedures/output-schema.adoc[].
 
 == Modifying enrichment mode
 
-=== Modifying CDC enrichment mode from within the Aura Console
+[NOTE]
+====
+Note that default log enrichment mode is `OFF` and change data capture is disabled until it is set as `DIFF` or `FULL`.
+====
 
-View an instance's current CDC enrichment mode by clicking on an instance’s card in the Aura Console dashboard. 
-Enrichment mode is set to `OFF` by default. 
+=== Modifying log enrichment mode from within the Aura Console
+
+View an instance's current log enrichment mode by clicking on an instance in the Aura Console dashboard. 
+
+For more information on performing a restore in Aura with log enrichment mode enabled see link:{neo4j-docs-base-uri}/auradb/change-data-capture/overview[AuraDB -> Change Data Capture (CDC)].
 
 === Creating a database with log enrichment enabled using Neo4j DBMS
 
 This provides a way to bootstrap a new database with log enrichment set as `FULL`.
 For `DIFF` log enrichment mode, replace `FULL` with `DIFF`.
-
-[NOTE]
-====
-Note that default log enrichment mode is `OFF` and change data capture is disabled until it is set as `DIFF` or `FULL`.
-====
 
 .Query
 [source, cypher]
@@ -47,13 +48,6 @@ CREATE DATABASE name OPTIONS {txLogEnrichment: "FULL"}
 ----
 
 === Modifying a database's log enrichment mode
-
-== Modifying CDC enrichment mode from within the Aura Console
-
-View an instance's current CDC enrichment mode by clicking on an instance’s card in the Aura Console dashboard. 
-Enrichment mode is set to `OFF` by default. 
-
-For more information see the link:{neo4j-docs-base-uri}/auradb/change-data-capture/overview[AuraDB -> Change Data Capture (CDC)].
 
 Log enrichment mode can also be set on an existing database.
 For `FULL` log enrichment mode, replace `DIFF` with `FULL`.
