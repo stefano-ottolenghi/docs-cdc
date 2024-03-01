@@ -27,7 +27,8 @@ For more details on the output schema see xref:procedures/output-schema.adoc[].
 
 === Modifying CDC enrichment mode from within the Aura Console
 
-View an instance's current CDC enrichment mode by clicking on an instance’s card in the Aura Console dashboard. Enrichment mode is set to OFF by default. 
+View an instance's current CDC enrichment mode by clicking on an instance’s card in the Aura Console dashboard. 
+Enrichment mode is set to `OFF` by default. 
 
 === Creating a database with log enrichment enabled using Neo4j DBMS
 
