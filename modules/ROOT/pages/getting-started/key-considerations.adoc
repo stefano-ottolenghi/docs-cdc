@@ -63,7 +63,7 @@ Depending on your application, these change events might still be unexpected and
 See xref:_unexpected_change_events[the following section], before performing these steps.
 ====
 
-. *Set the database into read only mode.* +
+. *Set the database to read only mode.* +
 This prevents any new changes coming through.
 
 . *Take note of the `txLogEnrichment` value of your database.* +
@@ -84,7 +84,7 @@ If necessary update the value using the `ALTER DATABASE` command (link:{neo4j-do
 When restoring a Neo4j database to a previous snapshot, the changes that have happened since the snapshot was taken are effectively reverted on the database.
 There is no process for letting your CDC application know that these changes 'never happened'.
 New changes on the restored database are changes compared to the state that the database had when the snapshot was taken.
-Effectively, your CDC application expects certain changes to have happened that according to your Neo4j database "never happened".
+Effectively, your CDC application expects certain changes to have happened that according to your Neo4j database 'never happened'.
 
 Some examples of problematic scenarios are:
 
