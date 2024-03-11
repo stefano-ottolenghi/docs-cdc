@@ -16,9 +16,9 @@ You can construct selectors that can both match nodes and relationships.
 [source, json]
 ----
 {
-  "select": "e", // <1>
-  "operation": "c", // <2>
-  "changesTo": ["name", "title"] // <3>
+  select: "e", // <1>
+  operation: "c", // <2>
+  changesTo: ["name", "title"] // <3>
 }
 ----
 All fields except for `select` are optional.
@@ -36,15 +36,15 @@ You can construct selectors that can only match nodes.
 [source, json]
 ----
 {
-  "select": "n", // <1>
-  "elementId": "4:b7e35973-0aff-42fa-873b-5de31868cb4a:1", // <2>
-  "key": { // <3>
-    "property": "value",
-    "otherProperty": "value"
+  select: "n", // <1>
+  elementId: "4:b7e35973-0aff-42fa-873b-5de31868cb4a:1", // <2>
+  key: { // <3>
+    property: "value",
+    otherProperty: "value"
   },
-  "labels": ["Person", "Actor"], // <4>
-  "operation": "c", // <5>
-  "changesTo": ["name", "lastName"] // <6>
+  labels: ["Person", "Actor"], // <4>
+  operation: "c", // <5>
+  changesTo: ["name", "lastName"] // <6>
 }
 ----
 All fields except for `select` are optional.
@@ -67,32 +67,32 @@ You can construct selectors that can only match relationships.
 [source, json, role="nocollapse"]
 ----
 {
-  "select": "r", // <1>
-  "elementId": "4:b7e35973-0aff-42fa-873b-5de31868cb4a:1", // <2>
-  "type": "ACTED_IN", // <3>
-  "key": { // <4>
-    "property": "value",
-    "otherProperty": "value"
+  select: "r", // <1>
+  elementId: "4:b7e35973-0aff-42fa-873b-5de31868cb4a:1", // <2>
+  type: "ACTED_IN", // <3>
+  key: { // <4>
+    property: "value",
+    otherProperty: "value"
   }, 
-  "start": { // <5>
-    "select": "n", // <6>
-    "elementId": "4:b7e35973-0aff-42fa-873b-5de31868cb4a:1", // <7>
-    "key": { // <8>
-      "userId": "1001",
-      "name": "John"
+  start: { // <5>
+    select: "n", // <6>
+    elementId: "4:b7e35973-0aff-42fa-873b-5de31868cb4a:1", // <7>
+    key: { // <8>
+      userId: "1001",
+      name: "John"
     },
-    "labels": ["Person", "Actor"] // <9>
+    labels: ["Person", "Actor"] // <9>
   },
-  "end":{ // <10>
-    "select": "n",
-    "elementId": "5:b7e35973-0aff-42fa-873b-5de31878ab4a:3",
-    "key": {
-      "title": "Matrix"
+  end:{ // <10>
+    select: "n",
+    elementId: "5:b7e35973-0aff-42fa-873b-5de31878ab4a:3",
+    key: {
+      title: "Matrix"
     },
-    "labels": ["Movie"]
+    labels: ["Movie"]
   },
-  "operation": "c", // <11>
-  "changesTo": ["name", "lastName"] // <12>
+  operation: "c", // <11>
+  changesTo: ["name", "lastName"] // <12>
 }
 ----
 All fields except for `select` are optional.
@@ -132,12 +132,12 @@ All of the above selectors also support matching based on the metadata associate
 [source, json]
 ----
 {
-  "select": "e", // <1>
-  "authenticatedUser": "alice", // <2>
-  "executingUser": "bob", // <3>
-  "txMetadata": { // <4>
-    "property": "value",
-    "otherProperty": 42
+  select: "e", // <1>
+  authenticatedUser: "alice", // <2>
+  executingUser: "bob", // <3>
+  txMetadata: { // <4>
+    property: "value",
+    otherProperty: 42
   },
   //...
 }
