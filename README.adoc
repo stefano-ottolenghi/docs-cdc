@@ -1,6 +1,10 @@
-= Documentation Template
+= Documentation for CDC
 
-This repo contains the files that you need to start a new Neo4j documentation project.
+This repo contains the files that you need to work with the CDC docs.
+There are two branches: `main` and `dev`.
+`main` reflects the current docs and `dev` should reflect the current docs plus any work to go in to the next release.
+All PRs should be raised against `dev` and if applicable, cherry-picked to `main`.
+Merged PRs against `main` are published automatically.
 
 == Prereqs
 
