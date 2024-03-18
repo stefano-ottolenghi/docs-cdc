@@ -6,6 +6,8 @@ There are two branches: `main` and `dev`.
 All PRs should be raised against `dev` and if applicable, cherry-picked to `main`.
 Merged PRs against `main` are published automatically.
 
+Upon release of a minor version, the `dev` branch is merged into the `main` branch.
+
 == Prereqs
 
 - link:https://nodejs.org/en/download/[Node.js]
