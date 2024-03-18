@@ -133,9 +133,9 @@ to
 a|
 label:functionality[]
 label:new[]
-[source, cypher, role="noheader"]
+[source, cypher, test-fail=Neo.ClientError.ChangeDataCapture.InvalidIdentifier]
 ----
-CALL cdc.query(selectors=[
+CALL cdc.query('A3V16ZaLlUmnipHLFkWrlA0AAAAAAAAABAAAAAAAAAAA', [
     {
         select: "e",
         authenticatedUser: "alice",

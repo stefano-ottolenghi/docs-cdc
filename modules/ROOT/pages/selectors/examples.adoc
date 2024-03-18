@@ -2,7 +2,7 @@
 
 [NOTE]
 ====
-The examples in this section assume that the parameter '$previousChangeId' is populated with a change id. 
+The examples in this section assume that the parameter '$previousChangeId' is populated with a change id.
 Either from the result of a previous xref:procedures/query.adoc[query] or from using the xref:procedures/current.adoc[current] or xref:procedures/earliest.adoc[earliest] procedures.
 ====
 
@@ -13,7 +13,7 @@ Changes can be filtered to only return creates, updates or deletes, regardless o
 [source, cypher]
 ----
 CALL db.cdc.query($previousChangeId, [{
-    select: "e", 
+    select: "e",
     operation: "c"
 }])
 ----
@@ -114,9 +114,9 @@ See xref:getting-started/constraints.adoc[] for details.
 [source, cypher]
 ----
 CALL db.cdc.query($previousChangeId, [{
-    select: "n", 
+    select: "n",
     key: {
-        name: "Kevin", 
+        name: "Kevin",
         surname: "Bacon"
     }
 }])
@@ -126,7 +126,7 @@ CALL db.cdc.query($previousChangeId, [{
 [source, cypher]
 ----
 CALL db.cdc.query($previousChangeId, [{
-    select: "r", 
+    select: "r",
     key: {
         registerId: 1001
     }
@@ -145,7 +145,7 @@ Node changes can be filtered to specific labels.
 [source, cypher]
 ----
 CALL db.cdc.query($previousChangeId, [{
-    select: "n", 
+    select: "n",
     labels: ["Person", "Actor"]
 }])
 ----
@@ -164,7 +164,7 @@ Relationship changes can be filtered to a specific type.
 [source, cypher]
 ----
 CALL db.cdc.query($previousChangeId, [{
-    select: "r", 
+    select: "r",
     type: "ACTED_IN"
 }])
 ----
@@ -249,19 +249,19 @@ CALL db.cdc.query($previousChangeId, [{
     select: "r",
     type: "ACTED_IN",
     start: {
-        labels: ["Person"],
+        labels: ["Person"]
     },
     end: {
-        labels: ["Movie"],
+        labels: ["Movie"]
     }
 }, {
     select: "r",
     type: "DIRECTED",
     start: {
-        labels: ["Person"],
+        labels: ["Person"]
     },
     end: {
-        labels: ["Movie"],
+        labels: ["Movie"]
     }
 }])
 ----

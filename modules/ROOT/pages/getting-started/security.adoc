@@ -8,8 +8,8 @@ In order to prevent unauthorized access, the procedure xref:procedures/query.ado
 For a regular user to be able to run `db.cdc.query`, the user must have been granted execute privileges as well as boosted execute privileges.
 [source, cypher]
 ----
-GRANT EXECUTE PROCEDURE db.cdc.query ON DBMS TO $role
-GRANT EXECUTE BOOSTED PROCEDURE db.cdc.query ON DBMS TO $role
+GRANT EXECUTE PROCEDURE db.cdc.query ON DBMS TO $role;
+GRANT EXECUTE BOOSTED PROCEDURE db.cdc.query ON DBMS TO $role;
 ----
 
 [NOTE]

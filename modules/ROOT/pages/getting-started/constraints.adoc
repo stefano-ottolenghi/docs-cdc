@@ -29,9 +29,10 @@ Assume that we have the following constraints for `Person` and `Employee` labels
 .Node key constraints for `Person` label
 [source, cypher]
 ----
-CREATE CONSTRAINT person_names_key IF NOT EXISTS FOR (n:Person) REQUIRE (n.firstName, n.lastName) IS NODE KEY
-CREATE CONSTRAINT person_ssn_key IF NOT EXISTS FOR (n:Person) REQUIRE (n.ssn) IS NODE KEY
+CREATE CONSTRAINT person_names_key IF NOT EXISTS FOR (n:Person) REQUIRE (n.firstName, n.lastName) IS NODE KEY;
+CREATE CONSTRAINT person_ssn_key IF NOT EXISTS FOR (n:Person) REQUIRE (n.ssn) IS NODE KEY;
 ----
+// `person_names` gets later dropped because of existence+uniqueness split constraints example
 
 .Node key constraint for `Employee` label
 [source, cypher]
@@ -115,11 +116,18 @@ For a full description of change record schema, see xref:procedures/output-schem
 ====
 Although the preferred way of specifying node key properties is creating a _node key_ constraint, the same can be achieved using both _unique node property_ and _node property existence_ constraints on the same set of properties.
 
+////
+[source, cypher, test-setup]
+----
+DROP CONSTRAINT person_names_key
+----
+////
+
 [source, cypher]
 ----
-CREATE CONSTRAINT person_firstName_exists FOR (n:Person) REQUIRE n.firstName IS NOT NULL;
-CREATE CONSTRAINT person_lastName_exists FOR (n:Person) REQUIRE n.lastName IS NOT NULL;
-CREATE CONSTRAINT person_unique FOR (n:Person) REQUIRE (n.firstName, n.lastName) IS UNIQUE;
+CREATE CONSTRAINT person_firstName_exists IF NOT EXISTS FOR (n:Person) REQUIRE n.firstName IS NOT NULL;
+CREATE CONSTRAINT person_lastName_exists IF NOT EXISTS FOR (n:Person) REQUIRE n.lastName IS NOT NULL;
+CREATE CONSTRAINT person_unique IF NOT EXISTS FOR (n:Person) REQUIRE (n.firstName, n.lastName) IS UNIQUE;
 ----
 ====
 
@@ -132,9 +140,11 @@ Assume that you have the following constraints for `MARRIED_TO` relationship typ
 .Relationship key for `MARRIED_TO` type
 [source, cypher]
 ----
-CREATE CONSTRAINT married_to_register_key FOR ()-[r:MARRIED_TO]-() REQUIRE (r.registerId) IS RELATIONSHIP KEY
-CREATE CONSTRAINT married_to_official_key FOR ()-[r:MARRIED_TO]-() REQUIRE (r.official) IS RELATIONSHIP KEY
+CREATE CONSTRAINT married_to_register_key IF NOT EXISTS FOR ()-[r:MARRIED_TO]-() REQUIRE (r.registerId) IS RELATIONSHIP KEY;
+CREATE CONSTRAINT married_to_official_key IF NOT EXISTS FOR ()-[r:MARRIED_TO]-() REQUIRE (r.official) IS RELATIONSHIP KEY;
 ----
+// `married_to_register_key` gets later dropped because of existence+uniqueness split constraints example
+
 
 Whenever a change happens on a relationship of type `MARRIED_TO` with `registerId` and `official` properties set as `1125` and `Alice Roberts` respectively, the change event includes the following key information.
 
@@ -206,10 +216,17 @@ For a full description of change record schema, see xref:procedures/output-schem
 ====
 Although the preferred way of specifying relationship key properties is creating _relationship key_ constraint, the same can be achieved using both _unique relationship property_ and _relationship property existence_ constraints on the same set of properties.
 
+////
+[source, cypher, test-setup]
+----
+DROP CONSTRAINT married_to_register_key
+----
+////
+
 [source, cypher]
 ----
-CREATE CONSTRAINT married_to_registerId_exists FOR ()-[r:MARRIED_TO]-() REQUIRE (r.registerId) IS NOT NULL;
-CREATE CONSTRAINT married_to_registerId_unique FOR ()-[r:MARRIED_TO]-() REQUIRE (r.registerId) IS UNIQUE;
+CREATE CONSTRAINT married_to_registerId_exists IF NOT EXISTS FOR ()-[r:MARRIED_TO]-() REQUIRE (r.registerId) IS NOT NULL;
+CREATE CONSTRAINT married_to_registerId_unique IF NOT EXISTS FOR ()-[r:MARRIED_TO]-() REQUIRE (r.registerId) IS UNIQUE;
 ----
 ====
 

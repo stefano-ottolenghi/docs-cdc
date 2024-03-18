@@ -25,7 +25,7 @@ See xref:getting-started/key-considerations.adoc#restore-from-backup[restore fro
 
 ====
 .Query earliest change identifier
-[source, cypher]
+[source, cypher, test-exclude-cols=id]
 ----
 CALL db.cdc.earliest()
 ----

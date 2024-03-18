@@ -25,7 +25,7 @@ db.cdc.query(
     seq :: INTEGER?, // <5>
     metadata :: MAP?, // <6>
     event :: MAP? // <7>
-) 
+)
 ----
 
 <1> The change identifier, either captured from an earlier call to `db.cdc.query` or from one of `db.cdc.current` or `db.cdc.earliest`, to query the captured changes from.
@@ -50,7 +50,7 @@ For a detailed description of change event, see xref:procedures/output-schema.ad
 
 ====
 .Query for changes
-[source, cypher]
+[source, cypher, test-fail=Neo.ClientError.ChangeDataCapture.InvalidIdentifier]
 ----
 CALL db.cdc.query("A3V16ZaLlUmnipHLFkWrlA0AAAAAAAAABAAAAAAAAAAA")
 ----

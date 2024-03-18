@@ -23,7 +23,7 @@ See about xref:getting-started/key-considerations.adoc#restore-from-backup[resto
 
 ====
 .Query current change identifier
-[source, cypher]
+[source, cypher, test-exclude-cols=id]
 ----
 CALL db.cdc.current()
 ----
