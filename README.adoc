@@ -6,6 +6,9 @@ There are two branches: `main` and `dev`.
 All PRs should be raised against `dev` and if applicable, cherry-picked to `main`.
 Merged PRs against `main` are published automatically.
 
+The examples in this repo have a separate repo with executable variants:
+https://github.com/neo-technology/cdc-documentation-examples
+
 Upon release of a minor version, the `dev` branch is merged into the `main` branch.
 
 == Prereqs

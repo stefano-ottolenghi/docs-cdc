@@ -40,6 +40,19 @@ The number of hours or days to keep transaction logs is highly dependent on your
 
 For more details on transaction log retention and how to configure it, see link:{neo4j-docs-base-uri}/operations-manual/{page-version}/configuration/transaction-logs/#transaction-logging-log-retention[Operations Manual -> Configuration -> Transaction Log].
 
+[[cursor-management]]
+== Cursor management and server side filtering
+The changeId returned from xref:procedures/earliest.adoc[db.cdc.earliest], xref:procedures/current.adoc[db.cdc.current] and xref:procedures/query.adoc[db.cdc.query] are valid until Neo4j performs transaction log rotation as discussed in the previous section.
+
+Usually the cursor stays valid, since each call to `db.cdc.query` updates the cursor.
+
+Very strict selectors may, however, cause `db.cdc.query` to not return any changes.
+This can in extreme cases lead to the cursor not being updated in time before transaction log rotation.
+To avoid this, the xref:examples/index.adoc[examples] in this documentation update the cursor to `db.cdc.current` if `db.cdc.query` returns empty.
+Note that `db.cdc.current` needs to be called and stored before `db.cdc.query` for this to work.
+
+Another way to avoid this issue is to use broader selectors and perform client side filtering instead.
+
 [[restore-from-backup]]
 == Backup and restore operations
 

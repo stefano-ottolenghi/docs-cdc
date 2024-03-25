@@ -42,7 +42,7 @@ static class Program
         private async Task QueryChanges(CancellationToken cancellation) // <2>
         {
             await using var session = _driver.AsyncSession(ConfigureSession(_database));
-
+            var current = await CurrentChangeId();
             await session.ExecuteReadAsync(async tx =>
             {
                 var from = _from;
@@ -52,10 +52,17 @@ static class Program
                     selectors = _selectors,
                 });
 
+                var processed = 0;
                 await foreach (var record in result.WithCancellation(cancellation))
                 {
                     ApplyChange(record); // <3>
                     _from = record["id"].As<string>(); // <4>
+                    processed++;
+                }
+
+                if (processed == 0)
+                {
+                    _from = current; // <5>
                 }
             });
         }
@@ -71,7 +78,7 @@ static class Program
             };
         }
 
-        private async Task<string> EarliestChangeId() // <5>
+        private async Task<string> EarliestChangeId() // <6>
         {
             var response = await _driver
                 .ExecutableQuery("CALL db.cdc.earliest")
@@ -81,7 +88,7 @@ static class Program
             return response.Result[0];
         }
 
-        private async Task<string> CurrentChangeId() // <6>
+        private async Task<string> CurrentChangeId() // <7>
         {
             var response = await _driver
                 .ExecutableQuery("CALL db.cdc.current")
@@ -107,7 +114,7 @@ static class Program
                     {
                         await QueryChanges(cancellation);
 
-                        await Task.Delay(TimeSpan.FromMilliseconds(500), cancellation); // <7>
+                        await Task.Delay(TimeSpan.FromMilliseconds(500), cancellation); // <8>
                     }
                 }
                 finally
@@ -167,7 +174,7 @@ static class Program
         {
             var selectors = new List<object>
             {
-                // new // <8>
+                // new // <9>
                 // {
                 //     select = "n", labels = new[] { "Person", "Employee" }
                 // },
@@ -191,9 +198,15 @@ static class Program
 
 <1> This method is called once for each change event. It should be replaced based on your use case.
 <2> This method fetches the changes from the database.
-<3> Here we call a method once for each change.
-<4> Note that `ExecuteReadAsync` may retry failing queries. In order to avoid seeing the same change twice, we update the cursor as we apply the changes.
-<5> Use this function to get the earliest available change id.
-<6> Use this function to get the current change id.
-<7> Here we wait for 500 milliseconds so that `QueryChanges` gets called repeatedly.
-<8> Here you can use a filter to receive only the changes you are interested in. The out-commented line would select only node changes that has both `Person` and `Employee` labels.
+<3> This method is called once for each change.
+<4> Note that `ExecuteReadAsync` may retry failing queries.
+To avoid seeing the same change twice, update the cursor as the changes are applied.
+
+<5> The cursor is moved forward to keep it up-to-date.
+This may not be necessary in your use case. 
+See xref:getting-started/key-considerations.adoc#cursor-management[Cursor Management] for details.
+<6> Use this function to get the earliest available change id.
+<7> Use this function to get the current change id.
+<8> Wait for 500 milliseconds so that `QueryChanges` gets called repeatedly.
+<9> The results may be filtered to return a subset of changes.
+The out-commented line would select only node changes that have both `Person` and `Employee` labels.

@@ -16,15 +16,20 @@ function applyChange(change) { // <1>
 async function queryChanges(driver, database, cursor, selectors) {
   const session = driver.session({database: database});
   try {
+    const current = currentChangeId(driver, database);
     await session.executeRead((tx) => {
       return tx.run('CALL db.cdc.query($from, $selectors)',
           {from: cursor, selectors: selectors}); // <2>
     })
         .then((res) => {
-          res.records.map((change) => {
-            applyChange(change); // <3>
-            cursor = change.get('id'); // <4>
-          });
+          if (res.records.length === 0) {
+            cursor = current; // <3>
+          } else {
+            res.records.map((change) => {
+              applyChange(change); // <4>
+              cursor = change.get('id'); // <5>
+            });
+          }
         });
   } catch (e) {
     console.log('Failed to apply change', e);
@@ -33,7 +38,6 @@ async function queryChanges(driver, database, cursor, selectors) {
   }
   return cursor;
 }
-
 function queryChangesLoop(driver, database, cursor, selectors) {
   setTimeout(async () => {
     cursor = await queryChanges(driver, database, cursor, selectors);
@@ -41,14 +45,14 @@ function queryChangesLoop(driver, database, cursor, selectors) {
   }, 500);
 }
 
-function earliestChangeId(driver, database) { // <5>
+function earliestChangeId(driver, database) { // <6>
   return driver.executeQuery('CALL db.cdc.earliest', {}, {database: database})
       .then((res) => {
         return res.records[0].get('id');
       });
 }
 
-function currentChangeId(driver, database) { // <6>
+function currentChangeId(driver, database) { // <7>
   return driver.executeQuery('CALL db.cdc.current', {}, {'database': database})
       .then((res) => {
         return res.records[0].get('id');
@@ -69,23 +73,30 @@ async function main() {
     cursor = await currentChangeId(driver, database);
   }
 
-  const selectors = [ // <7>
+  const selectors = [ // <8>
     // {"select":"n"}
   ];
-  queryChangesLoop(driver, database, cursor, selectors); // <8>
+  queryChangesLoop(driver, database, cursor, selectors); // <9>
 
-  // await driver.close() // <9>
+  // await driver.close() // <10>
 }
 
 main();
 
 ----
-<1> This method is called once for each change event. It should be replaced depending on your use case.
+<1> This method is called once for each change.
 <2> This query fetches the changes from the database.
-<3> Here we call a method once for each change.
-<4> Note that we update the cursor defined outside the anonymous function. `session.executeRead` might re-try the query, re-running the inner anonymous function. In order to avoid re-trying from an already applied cursor position, we need to ensure that further calls to `db.cdc.query` are executed with the new cursor value.
-<5> Use this function to get the earliest available change id.
-<6> Use this function to get the current change id.
-<7> Here you can limit the returned changes. The out-commented line would select only node changes and exclude all relationship changes.
-<8> We call `queryChanges` repeatedly, using the cursor from the previous call.
-<9> Call `driver.close()` when you want to terminate the loop.
+<3> The cursor is moved forward to keep it up-to-date. 
+This may not be necessary in your use case. 
+See xref:getting-started/key-considerations.adoc#cursor-management[Cursor Management] for details.
+<4> A function is called once for each change.
+<5> Note that the cursor defined outside the anonymous function is updated. 
+`session.executeRead` might re-try the query, re-running the inner anonymous function.
+To avoid seeing the same change twice, update the cursor as the changes are applied.
+
+<6> Use this function to get the earliest available change id.
+<7> Use this function to get the current change id.
+<8> The results may be filtered to return a subset of changes.
+The out-commented line would select only node changes and exclude all relationship changes.
+<9> Call `queryChanges` repeatedly, using the cursor from the previous call.
+<10> Call `driver.close()` when the loop should be terminated.

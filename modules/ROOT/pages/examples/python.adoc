@@ -28,32 +28,36 @@ class CDCService:
         print(json.dumps(record_dict, indent=2, default=repr))
 
     def query_changes_query(self, tx):
+        current = self.current_change_id()
         result = tx.run('CALL db.cdc.query($cursor, $selectors)', # <2>
                         cursor=self.cursor, selectors=self.selectors)
-        for record in result:
-            try:
-                self.apply_change(record) # <3>
-            except Exception as e:
-                print('Error whilst applying change', e)
-                break
-            self.cursor = record['id'] # <4>
+        if result.peek() == None:
+            self.cursor = current # <3>
+        else:
+            for record in result:
+                try:
+                    self.apply_change(record) # <4>
+                except Exception as e:
+                    print('Error whilst applying change', e)
+                    break
+                self.cursor = record['id'] # <5>
 
     def query_changes(self):
         with self.driver.session(database=self.database) as session:
             session.execute_read(self.query_changes_query)
 
-    def earliest_change_id(self): # <5>
+    def earliest_change_id(self): # <6>
         records, _, _ = self.driver.execute_query(
             'CALL db.cdc.earliest', database_=self.database)
         return records[0]['id']
 
-    def current_change_id(self): # <6>
+    def current_change_id(self): # <7>
         records, _, _ = self.driver.execute_query(
             'CALL db.cdc.current', database_=self.database)
         return records[0]['id']
 
     def run(self):
-        while True: # <8>
+        while True: # <9>
             self.query_changes()
             time.sleep(0.5)
 
@@ -81,7 +85,7 @@ def main(argv):
         elif opt in ('-f', '--from'):
             cursor = arg
 
-    selectors = [ # <7>
+    selectors = [ # <8>
         # {'select': 'n'}
     ]
 
@@ -97,9 +101,15 @@ if __name__ == '__main__':
 ----
 <1> This method is called once for each change event. It should be replaced depending on your use case.
 <2> This query fetches the changes from the database.
-<3> Here we call a method once for each change.
-<4> `session.execute_read` may retry `query_changes_query`, for example when there are network issues. Thus `query_changes_query` must be idempotent. We keep it idempotent by updating the cursor as we go.
-<5> Use this function to get the earliest available change id.
-<6> Use this function to get the current change id.
-<7> Here you can limit the returned changes. The out-commented line would select only node changes and exclude all relationship changes.
-<8> We call `query_changes` repeatedly, using the cursor from the previous call.
+<3> The cursor is moved forward to keep it up-to-date. 
+This may not be necessary in your use case. 
+See xref:getting-started/key-considerations.adoc#cursor-management[Cursor Management] for details.
+<4> This method is called once for each change.
+<5> `session.execute_read` may retry `query_changes_query` when there are network issues, for example.
+To avoid seeing the same change twice, update the cursor as the changes are applied.
+
+<6> Use this function to get the earliest available change id.
+<7> Use this function to get the current change id.
+<8> The results may be filtered to return a subset of changes.
+The out-commented line would select only node changes and exclude all relationship changes.
+<9> Call `query_changes` repeatedly, using the cursor from the previous call.

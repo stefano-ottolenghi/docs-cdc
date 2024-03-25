@@ -52,21 +52,27 @@ class CDCService implements Closeable {
 
     private synchronized void queryChanges() { // <2>
         try (var session = driver.session(SessionConfig.forDatabase(database))) {
+            var current = currentChangeID();
             session.executeRead(tx -> {
-                var result = tx.run(new Query("CALL db.cdc.query($from, $selectors)", Map.of("from", cursor, "selectors", selectors)));
-                while (result.hasNext()) {
-                    var change = result.next();
-                    applyChange(change); // <3>
-                    cursor.set(change.get("id").asString()); // <4>
+                var result = tx.run(new Query("CALL db.cdc.query($from, $selectors)", Map.of("from", cursor.get(), "selectors", selectors)));
+                if (!result.hasNext()) {
+                    cursor.set(current); // <3>
+                } else {
+                    while (result.hasNext()) {
+                        var change = result.next();
+                        applyChange(change); // <4>
+                        cursor.set(change.get("id").asString()); // <5>
+                    }
                 }
                 return cursor.get();
             });
         } catch (Exception e) {
+            System.err.println(e.getMessage());
             throw new RuntimeException("Error querying/processing changes.", e);
         }
     }
 
-    private String earliestChangeID() { // <5>
+    private String earliestChangeID() { // <6>
         try (var session = driver.session(SessionConfig.forDatabase(database))) {
             return session.executeRead(tx -> {
                 var result = tx.run(new Query("CALL db.cdc.earliest"));
@@ -75,7 +81,7 @@ class CDCService implements Closeable {
         }
     }
 
-    private String currentChangeID() { // <6>
+    private String currentChangeID() { // <7>
         try (var session = driver.session(SessionConfig.forDatabase(database))) {
             return session.executeRead(tx -> {
                 var result = tx.run(new Query("CALL db.cdc.current"));
@@ -86,7 +92,7 @@ class CDCService implements Closeable {
 
     public void start(String from) {
         cursor.set(from == null ? currentChangeID() : from);
-        scheduler.scheduleWithFixedDelay(this::queryChanges, 0, 500, TimeUnit.MILLISECONDS); // <7>
+        scheduler.scheduleWithFixedDelay(this::queryChanges, 0, 500, TimeUnit.MILLISECONDS); // <8>
         Runtime.getRuntime().addShutdownHook(new Thread(scheduler::shutdownNow));
     }
 
@@ -115,7 +121,7 @@ public class Example implements Callable<Integer> {
     public Integer call() {
 
         var cdcService = new CDCService(address, database, username, password);
-        List<Map<String, Object>> selectors = List.of( // <8>
+        List<Map<String, Object>> selectors = List.of( // <9>
 //                Map.of("select", "n")
         );
         cdcService.setSelectors(selectors);
@@ -141,11 +147,17 @@ public class Example implements Callable<Integer> {
 }
 
 ----
-<1> This method is called once for each change event. It should be replaced depending on your use case.
+<1> This method is called once for each change.
 <2> This query fetches the changes from the database.
-<3> Here we call a method once for each change.
-<4> Note that `executeRead` may retry failing queries. In order to avoid seeing the same change twice, we update the cursor as we apply the changes.
-<5> Use this function to get the earliest available change id.
-<6> Use this function to get the current change id.
-<7> Here we schedule such that `queryChanges` gets called repeatedly.
-<8> Here you can limit the returned changes. The out-commented line would select only node changes and exclude all relationship changes.
+<3> The cursor is moved forward to keep it up-to-date. 
+This may not be necessary in your use case. 
+See xref:getting-started/key-considerations.adoc#cursor-management[Cursor Management] for details.
+<4> A function is called once for each change.
+<5> Note that `executeRead` may retry failing queries.
+To avoid seeing the same change twice, update the cursor as the changes are applied.
+
+<6> Use this function to get the earliest available change id.
+<7> Use this function to get the current change id.
+<8> Schedule such that `queryChanges` gets called repeatedly.
+<9> The results may be filtered to return a subset of changes.
+The out-commented line would select only node changes and exclude all relationship changes.
