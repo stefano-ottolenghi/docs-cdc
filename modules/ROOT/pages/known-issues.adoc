@@ -2,14 +2,23 @@
 = Known Issues
 :description: This chapter describes known issues related to CDC.
 
-== Neo4j 5.16
-As of Neo4j 5.16 the CDC feature has the following known issues.
+== Neo4j 5.18
+As of Neo4j 5.18 the CDC feature has the following known issues.
 
-=== Outdated ChangeId with strict selectors
-Neo4j provides an updated changeId with each change returned through xref:procedures/current.adoc[db.cdc.current]. With selectors filtering out certain changes, xref:procedures/current.adoc[db.cdc.current] might not return any changes and therefore no updated changeId. If the changeId is not updated for long enough it will become invalid and Neo4j will throw an error.
+=== Unstable elementId
+CDC returns the same element ID as provided by the link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/functions/scalar/#functions-elementid[elementId()] function.
+This element ID is not stable through processes that change the underlying database such as:
 
-==== Mitigations
-- The issue can be avoided by performing all change filtering on the client side instead of using selectors.
-- The issue can be mitigated by ensuring that provided selectors include enough changes within the timeframe dictated by xref:getting-started/key-considerations.adoc#log-retention[transaction log retention] settings to keep the changeId updated.
+- Restoring from backup
+- Copying the database to a new name or location.
+- Pausing and resuming the database in Neo4j Aura.
 
-The API is likely to change during Beta to resolve this issue.
+This means that performing any of the listed actions causes new changes to the same element to be transmitted with a different elementId.
+
+Neo4j recommends that logical / business keys are used to identify elements.
+See xref:getting-started/constraints.adoc#change-data-capture-constraints[Capturing Key Properties] for details on logical / business keys.
+
+=== Unstable changeId
+The change identifier which CDC uses to track the location in the transaction log has similar issues as the elementId.
+The actions listed under xref:_unstable_elementid[] also cause changeIds to become invalid.
+After performing any of these actions it might be required to restart querying changes from xref:procedures/current.adoc[db.cdc.current] or xref:procedures/earliest.adoc[db.cdc.earliest].

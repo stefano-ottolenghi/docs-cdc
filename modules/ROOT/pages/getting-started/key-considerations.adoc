@@ -116,6 +116,13 @@ Which could cause the two systems to treat the node differently.
 
 If your CDC application relies on an internal state it is likely required to restore the state of your CDC application as if it was working with a new database with existing data. For details on this process read the xref:_using_cdc_with_existing_databases[relevant section above].
 
+=== Inconsistent elementId
+The elementId returned by `db.cdc.query` is not guaranteed to be stable across operations that change the underlying database.
+After restoring from backup, new changes to existing elements are published under a new elementId.
+
+Neo4j recommends that logical / business keys are used to identify elements instead of elementId.
+See xref:getting-started/constraints.adoc#change-data-capture-constraints[Capturing Key Properties] for details on logical / business keys.
+
 [[non-tx-log-changes]]
 == Unrecorded changes
 
