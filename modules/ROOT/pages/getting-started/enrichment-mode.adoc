@@ -23,6 +23,7 @@ On databases with `FULL` enrichment mode, The `event.state.before` and `event.st
 With `DIFF` mode they only contain removals, updates and additions.
 For more details on the output schema see xref:procedures/output-schema.adoc[].
 
+[[modifying_enrichment_mode]]
 == Modifying enrichment mode
 
 === Creating a database with log enrichment enabled

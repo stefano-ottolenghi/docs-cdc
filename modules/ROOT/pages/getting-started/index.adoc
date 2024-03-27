@@ -5,6 +5,7 @@
 
 This chapter describes the following:
 
+* xref:getting-started/quick-start.adoc[]
 * xref:getting-started/key-considerations.adoc[]
 * xref:getting-started/security.adoc[]
 * xref:getting-started/enrichment-mode.adoc[]
