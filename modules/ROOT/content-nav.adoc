@@ -1,20 +1,14 @@
 * xref:index.adoc[]
-* xref:getting-started/index.adoc[]
-** xref:getting-started/key-considerations.adoc[]
-** xref:getting-started/security.adoc[]
-** xref:getting-started/enrichment-mode.adoc[]
-** xref:getting-started/constraints.adoc[]
+// * xref:get-started/index.adoc[]
+* xref:get-started/on-prem.adoc[]
+// ** xref:get-started/aura.adoc[]
 
 * xref:procedures/index.adoc[]
-** xref:procedures/query.adoc[]
 // TODO maybe have a "previous" here, indicating how to fetch the ID from the previous
-** xref:procedures/earliest.adoc[]
-** xref:procedures/current.adoc[]
+** xref:procedures/selectors.adoc[]
+** xref:procedures/query-examples.adoc[]
 ** xref:procedures/output-schema.adoc[]
-
-
-* xref:selectors/index.adoc[]
-** xref:selectors/examples.adoc[]
+** xref:procedures/elementids-key-properties.adoc[]
 
 * xref:examples/index.adoc[]
 ** xref:examples/csharp.adoc[C#]
@@ -22,6 +16,9 @@
 ** xref:examples/java.adoc[Java]
 ** xref:examples/js.adoc[Javascript]
 ** xref:examples/python.adoc[Python]
+
+* xref:backup-restore.adoc[]
+* xref:existing-databases.adoc[]
 
 * xref:troubleshooting.adoc[]
 * xref:known-issues.adoc[]

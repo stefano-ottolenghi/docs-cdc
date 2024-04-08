@@ -1,0 +1,149 @@
+= Enable CDC on self-hosted instances (on-prem)
+
+
+include::partial$get-started.adoc[tags=intro]
+
+
+[[set-enrichment-mode]]
+== Set the enrichment mode
+
+=== Create a database with log enrichment enabled
+
+To create a new database with CDC enabled, use the link:https://www.neo4j.com/docs/operations-manual/current/database-administration/standard-databases/manage-databases/#manage-databases-create[`CREATE DATABASE`] Cypher command and set the option `txLogEnrichment` to either `FULL` or `DIFF`.
+
+.Query
+[source, cypher]
+----
+CREATE DATABASE <dbName> OPTIONS {txLogEnrichment: "FULL"}
+----
+
+=== Modify a database's log enrichment mode
+
+To tweak the enrichment mode on an existing database, use the https://www.neo4j.com/docs/operations-manual/current/database-administration/standard-databases/manage-databases/#administration-databases-alter-database[`ALTER DATABASE`] Cypher command and set the option `txLogEnrichment` to either `FULL` or `DIFF`.
+
+.Query
+[source, cypher]
+----
+ALTER DATABASE name SET OPTION txLogEnrichment "DIFF"
+----
+
+[IMPORTANT]
+====
+Modifying enrichment mode from `DIFF` to `FULL` or viceversa immediately changes the  xref:procedures/output-schema.adoc[structure of captured changes].
+Your CDC application must be able to deal with the different format.
+====
+
+[[get-enrichment-mode]]
+=== Get a database's log enrichment mode
+
+To see what value the enrichment mode of a database is, use the link:https://neo4j.com/docs/operations-manual/current/database-administration/standard-databases/manage-databases/#manage-databases-list[`SHOW DATABASES`] Cypher command.
+
+.Query
+[source, cypher]
+----
+SHOW DATABASES YIELD name, options
+----
+
+
+.Result
+[role="queryresult",options="header,footer",cols="1m,1m"]
+|===
+| name | options
+
+| "neo4j"
+| {"txLogEnrichment": "FULL"}
+
+
+| "system"
+| {}
+
+|===
+
+
+=== Disable log enrichment
+
+To disable log enrichment on a database, either set `txLogEnrichment` explicitly to `OFF` or remove it altogether.
+
+.Using set option clause
+[source, cypher]
+----
+ALTER DATABASE name SET OPTION txLogEnrichment "OFF"
+----
+
+.Using remove option clause
+[source, cypher]
+----
+ALTER DATABASE name REMOVE OPTION txLogEnrichment
+----
+
+[WARNING]
+====
+Disabling enrichment immediately breaks the continuity of change events.
+**Change identifiers generated before disabling can no longer be used and, even if enrichment is re-enabled, the previously-generated change identifiers remain invalid.**
+Disabling and then re-enabling CDC is equivalent to enabling it for the first time: there is no memory of previous changes.
+====
+
+== Points to consider
+
+[[security]]
+=== Security
+
+CDC returns all changes in the database and is not limited to the entities which a certain user is allowed to access.
+In order to prevent unauthorized access, the procedure xref:procedures/index.adoc#query[`db.cdc.query`] requires admin privileges and should be configured for least privilege access.
+
+For a regular user to be able to run `db.cdc.query`, the user must have been granted execute privileges as well as boosted execute privileges.
+
+[source, cypher]
+----
+GRANT EXECUTE PROCEDURE db.cdc.query ON DBMS TO $role;
+GRANT EXECUTE BOOSTED PROCEDURE db.cdc.query ON DBMS TO $role;
+----
+
+[NOTE]
+====
+Non-boosted execute privileges are usually part of the `PUBLIC` role, in which case they do not need to be granted a second time.
+====
+
+Furthermore, the user does not have access to a database unless they have been granted access.
+
+[source, cypher]
+----
+GRANT ACCESS ON DATABASE $database TO $role
+----
+
+[NOTE]
+====
+Usually the `PUBLIC` role already has access to the default database.
+====
+
+The procedures xref:procedures/index.adoc#current[`db.cdc.current`] and xref:procedures/index.adoc#earliest[`db.cdc.earliest`] do not require admin privileges. In order to execute these, access to the database and regular execution privileges are sufficient.
+
+For more details regarding procedure privileges in Neo4j, see link:{neo4j-docs-base-uri}/operations-manual/{page-version}/authentication-authorization/manage-execute-permissions[Operations Manual -> Manage procedure and user-defined function permissions].
+
+
+[[disk-size]]
+=== Disk size
+
+Enabling change data capture on a database causes more data to be written into transaction log files.
+This means that the log files are rotated more frequently and log pruning is activated sooner (based on your configuration).
+The disk may run out of space if the disk size for transaction log storage is limited, so ensure that you have plenty of available space.
+
+In particular, **plan for a 50% increase in data written to the transaction log with `DIFF` enrichment mode, and 75% for `FULL` enrichment mode.**
+Actual disk usage depends on the application, data model and transaction characteristics.
+
+
+[[log-retention]]
+=== Transaction log retention
+
+Since Neo4j stores change data capture information inside transaction log entries, you should configure the transaction log retention period based on your application requirements.
+
+The number of hours or days to keep the transaction log is highly dependent on your CDC use case, but as a general rule of thumb you can pick the period based on downtime tolerance of your downstream application so that the changes you have not yet processed are not pruned.
+
+For more details on transaction log retention and how to configure it, see link:{neo4j-docs-base-uri}/operations-manual/{page-version}/configuration/transaction-logs/#transaction-logging-log-retention[Operations Manual -> Configuration -> Transaction Log].
+
+
+[[non-tx-log-changes]]
+=== Unrecorded changes
+
+CDC can only capture data changes that pass through the transaction layer and any data creation that avoids this layer can therefore not be captured.
+For example, when importing data with the link:{neo4j-docs-base-uri}/operations-manual/current/tools/neo4j-admin/neo4j-admin-import/[`neo4j-admin database import`] tool, whether full or incremental, or when loading data with the link:{neo4j-docs-base-uri}/operations-manual/current/backup-restore/restore-dump/[`neo4j-admin database load`] tool, data is written directly to the store without sending anything to the transaction log, so such changes are **not** captured by CDC.

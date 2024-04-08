@@ -1,0 +1,15 @@
+tag::intro[]
+
+Neo4j extracts CDC information from the transaction log.
+However, by default the transaction log does not contain information directly usable by CDC.
+For CDC to work, the transaction log need to be _enriched_ with further information.
+This is applied as an extra configuration option to each database.
+As soon as CDC is enabled, the database is ready to answer CDC queries from xref:examples/index.adoc[client applications].
+
+CDC has three _enrichment modes_:
+
+- `OFF` -- CDC is disabled (default).
+- `DIFF` -- Changes are captured as the difference between before and after states of each changed entity (i.e. they only contain removals, updates and additions).
+- `FULL` -- Changes are recorded as a complete copy of the before and after states of each changed entity (i.e. the contain the full node/relationship, regardless of the extent to which they were altered).
+
+end::intro[]

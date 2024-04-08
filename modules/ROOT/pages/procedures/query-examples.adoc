@@ -2,8 +2,8 @@
 
 [NOTE]
 ====
-The examples in this section assume that the parameter '$previousChangeId' is populated with a change id.
-Either from the result of a previous xref:procedures/query.adoc[query] or from using the xref:procedures/current.adoc[current] or xref:procedures/earliest.adoc[earliest] procedures.
+The examples in this section assume that the parameter `$previousChangeId` is populated with a change identifier,
+either from the result of a previous xref:procedures/index.adoc#query[query] or from using the xref:procedures/index.adoc#current[current] or xref:procedures/index.adoc#earliest[earliest] procedures.
 ====
 
 == Selecting entities based on operation type
@@ -108,7 +108,7 @@ CALL db.cdc.query($previousChangeId, [{
 == Selecting entities by key
 Node changes can be filtered to match specified key properties.
 The provided key properties need to fully match to a corresponding node key or relationship key on the entity.
-See xref:getting-started/constraints.adoc[] for details.
+See xref:procedures/elementids-key-properties.adoc[] for details.
 
 .Query node changes by key
 [source, cypher]
@@ -154,7 +154,7 @@ CALL db.cdc.query($previousChangeId, [{
 ====
 The query above only returns changes on nodes that have *both* labels either before or after the change.
 In order to get changes on nodes with either label, two separate selectors have to be specified.
-See xref:selectors/index.adoc#combining-selectors[combining selectors] for details.
+See xref:procedures/selectors.adoc#combining-selectors[combining selectors] for details.
 ====
 
 == Selecting relationships by type

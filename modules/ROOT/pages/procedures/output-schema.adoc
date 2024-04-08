@@ -1,12 +1,10 @@
-[[change-data-capture-output]]
-= Change event schema
+= Format of change events
 
-Contents of change events differ by the underlying entity.
+The content of the change events differs depending on the type of entity (node or relationship).
 
-== Node Changes
+== Node changes
 
-Change events for nodes follow this schema:
-
+.Format of change events for nodes
 [source, json, role=nocollapse]
 ----
 {
@@ -64,18 +62,16 @@ Change events for nodes follow this schema:
 }
 ----
 <1> A unique change identifier that identifies this change record.
-Used as a cursor to continue querying changes from last processed change.
+It can be used to query changes from this change onward.
 <2> A number identifying which transaction the change happened in, unique in combination with `seq`.
-Transaction identifiers are not continuous.
-Some transactions, such as system and schema commands, are not recorded in change data capture and cause gaps in the transaction identifiers.
-<3> A number used for ordering changes happened in the same transaction.
-Note that the order of changes observed in the output does not necessarily correspond to the order of changes applied during the transaction.
+Transaction identifiers are not continuous (some transactions, such as system and schema commands, are not recorded in change data capture and cause gaps in the transaction identifiers).
+<3> A number used for ordering changes that happened in the same transaction.
+Note that the order of changes observed in the output does not necessarily correspond to the order in which changes were applied during the transaction.
 <4> The user that performed this change.
-May be different from `authenticatedUser` when using impersonation.
-See link:{neo4j-docs-base-uri}/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[Operations Manual -> Authentication and authorization -> Manage privileges -> DBMS privileges] for more information on impersonation.
+May be different from `authenticatedUser` when using link:https://neo4j.com/docs/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[impersonation].
 <5> The authenticated user when this change was performed.
 <6> The transaction log enrichment mode at the time this change was captured.
-<7> The client's address (usually IP address and port but might change based on protocol).
+<7> The client's address (usually IP address and port, but it might change based on protocol).
 <8> The identifier of the server that performed this change.
 See link:{neo4j-docs-base-uri}/operations-manual/{page-version}/clustering/servers/#_listing_servers[Operations Manual -> Clustering -> Managing servers in a cluster] for more information on servers.
 <9> The database unique ID. See link:{neo4j-docs-base-uri}/operations-manual/{page-version}/database-administration/[Operations Manual -> Database administration] for more information on managing multiple databases.
@@ -84,35 +80,31 @@ See link:{neo4j-docs-base-uri}/operations-manual/{page-version}/clustering/serve
 <12> The timestamp when the underlying transaction started.
 <13> The timestamp when the underlying transaction committed.
 <14> The metadata associated with the transaction when the operation was performed.
-<15> The element id of the changed entity (node or relationship).
-See link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/functions/scalar/#functions-elementid[Cypher Manual -> Functions -> Scalar functions] for more information on element ids.
+<15> The link:https://neo4j.com/docs/cypher-manual/5/functions/scalar/#functions-elementid[elementId] of the changed entity (node or relationship).
 <16> The keys identifying the changed entity.
-Requires specific constraint types defined on entities, see xref:getting-started/constraints.adoc[] for details.
+This requires key constraints defined on the changed entities, see xref:procedures/elementids-key-properties.adoc[] for details.
 <17> Type of the changed entity: `n` for nodes and `r` for relationships.
 <18> A map describing the state of the entity before the change.
 This field is always `NULL` for create events.
 When on `DIFF` enrichment mode, it is limited to the properties and labels of the entity that have changed.
-See xref:getting-started/enrichment-mode.adoc#enrichment-mode[enrichment mode] for details.
-This field always contains the full state of the entity for delete events, regardless of the enrichment mode being set to `DIFF` or `FULL`.
+This field always contains the full state of the entity for delete events, regardless of whether the enrichment mode is set to `DIFF` or `FULL`.
 <19> A map describing the state of the entity after the change.
 This field is always `NULL` for delete events.
 When on `DIFF` enrichment mode, it is limited to the properties and labels of the entity that have changed.
-See xref:getting-started/enrichment-mode.adoc#enrichment-mode[enrichment mode] for details.
-This field always contains the full state of the entity for create events, regardless of the enrichment mode being set to `DIFF` or `FULL`.
+This field always contains the full state of the entity for create events, regardless of whether the enrichment mode is set to `DIFF` or `FULL`.
 <20> A map of properties of the entity after the change.
-<21> List of labels of the node after the change has been applied.
+<21> List of node labels after the change was applied.
 When on `DIFF` enrichment mode, it is limited to the changed labels.
-See xref:getting-started/enrichment-mode.adoc#enrichment-mode[enrichment mode] for details.
-<22> Type of the operation: `c` for creates, `u` for updates, and `d` for deletions.
-<23> List of labels of the changed node.
-This list is always populated from the `before` state of the node.
+<22> Type of the operation: `c` for creates, `u` for updates, `d` for deletions.
+<23> List of node labels before the change was applied.
 It contains the complete set of labels regardless of the enrichment mode.
 
 
 == Relationship changes
-Change events for relationships follow a similar schema to node changes.
-Note that only the differences are annotated below.
+Change events for relationships follow a similar schema to node changes. +
+Only the differences are annotated below.
 
+.Format of change events for relationships
 [source, json, role=nocollapse]
 ----
 {
@@ -149,13 +141,12 @@ Note that only the differences are annotated below.
       ]
     },
     "eventType": "r",
-    "state": {
+    "state": {  // <6>
       "before": null,
       "after": {
         "properties": {
           "roles": "Jack Swigert"
         }
-        // <6>
       }
     },
     "type": "ACTED_IN", // <7>
@@ -172,11 +163,11 @@ Note that only the differences are annotated below.
 }
 ----
 <1> A map containing information about the start node.
-<2> Element id of the start node.
+<2> ElementId of the start node.
 <3> Keys (if related constraints are defined) of the start node.
 <4> List of labels of the start node.
 <5> Same set of information defined above for the end node.
 <6> Since relationships do not have labels, there is no field for labels in the before / after state.
 <7> Relationship type.
 <8> The keys identifying the changed entity.
-Requires specific constraint types defined on entities, see xref:getting-started/constraints.adoc[] for details.
+This requires key constraints defined on the changed entities, see xref:procedures/elementids-key-properties.adoc[] for details.

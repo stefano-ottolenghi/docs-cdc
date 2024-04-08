@@ -86,11 +86,11 @@ main();
 ----
 <1> This method is called once for each change.
 <2> This query fetches the changes from the database.
-<3> The cursor is moved forward to keep it up-to-date. 
-This may not be necessary in your use case. 
-See xref:getting-started/key-considerations.adoc#cursor-management[Cursor Management] for details.
+<3> The cursor is moved forward to keep it up-to-date.
+This may not be necessary in your use case.
+See xref:examples/index.adoc#cursor-management[Cursor Management] for details.
 <4> A function is called once for each change.
-<5> Note that the cursor defined outside the anonymous function is updated. 
+<5> Note that the cursor defined outside the anonymous function is updated.
 `session.executeRead` might re-try the query, re-running the inner anonymous function.
 To avoid seeing the same change twice, update the cursor as the changes are applied.
 

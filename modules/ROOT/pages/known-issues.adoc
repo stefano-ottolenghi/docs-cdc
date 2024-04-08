@@ -1,4 +1,3 @@
-[[known-issues]]
 = Known Issues
 :description: This chapter describes known issues related to CDC.
 
@@ -6,8 +5,8 @@
 As of Neo4j 5.18 the CDC feature has the following known issues.
 
 === Unstable elementId
-CDC returns the same element ID as provided by the link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/functions/scalar/#functions-elementid[elementId()] function.
-This element ID is not stable through processes that change the underlying database such as:
+CDC returns the same elementId as provided by the link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/functions/scalar/#functions-elementid[elementId()] function.
+This elementId is not stable through processes that change the underlying database such as:
 
 - Restoring from backup
 - Copying the database to a new name or location.
@@ -15,10 +14,10 @@ This element ID is not stable through processes that change the underlying datab
 
 This means that performing any of the listed actions causes new changes to the same element to be transmitted with a different elementId.
 
-Neo4j recommends that logical / business keys are used to identify elements.
-See xref:getting-started/constraints.adoc#change-data-capture-constraints[Capturing Key Properties] for details on logical / business keys.
+It is recommended that logical / business keys are used to identify elements.
+See xref:procedures/elementids-key-properties.adoc[] for details on logical / business keys.
 
 === Unstable changeId
 The change identifier which CDC uses to track the location in the transaction log has similar issues as the elementId.
-The actions listed under xref:_unstable_elementid[] also cause changeIds to become invalid.
-After performing any of these actions it might be required to restart querying changes from xref:procedures/current.adoc[db.cdc.current] or xref:procedures/earliest.adoc[db.cdc.earliest].
+The actions listed under xref:_unstable_elementid[] also cause change identifiers to become invalid.
+After performing any of these actions it might be required to restart querying changes from xref:procedures/index.adoc#current[db.cdc.current] or xref:procedures/index.adoc#earliest[db.cdc.earliest].

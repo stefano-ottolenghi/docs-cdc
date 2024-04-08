@@ -1,0 +1,13 @@
+= Initialize CDC applications from an existing database
+
+You can enable log enrichment on existing databases, but that will only affect future transactions and existing data will not be surfaced by CDC procedures.
+If your use case requires a snapshot of existing data for CDC purposes, you have to do so manually and without the aid of CDC query procedures.
+
+In particular, the recommended steps are:
+
+* Enable log enrichment on the database
+* Set database to read-only
+* Capture the xref:procedures/index.adoc#current[current change identifier]
+* Perform a snapshot using an application of your own that reads all nodes and relationships of interest and processes those according to your CDC requirements
+* Set database to read-write
+* Run your CDC application starting with the captured change identifier

@@ -203,8 +203,8 @@ static class Program
 To avoid seeing the same change twice, update the cursor as the changes are applied.
 
 <5> The cursor is moved forward to keep it up-to-date.
-This may not be necessary in your use case. 
-See xref:getting-started/key-considerations.adoc#cursor-management[Cursor Management] for details.
+This may not be necessary in your use case.
+See xref:examples/index.adoc#cursor-management[Cursor Management] for details.
 <6> Use this function to get the earliest available change id.
 <7> Use this function to get the current change id.
 <8> Wait for 500 milliseconds so that `QueryChanges` gets called repeatedly.

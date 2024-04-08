@@ -1,0 +1,55 @@
+= Restore backups and snapshots
+
+Restoring your Neo4j database from a backup or snapshot is likely to cause *loss of data and corrupted data in your CDC application*.
+The following sections outline the issues you may run into if you are using CDC and intend to restore a database backup, and how to mitigate them.
+
+
+[#unexpected-change-events]
+== Unexpected change events
+When restoring a Neo4j database to a previous snapshot, the changes that have happened since the snapshot was taken are effectively reverted on the database.
+There is no process for letting your CDC client application know that these changes "never happened".
+Effectively, your CDC client application expects certain changes to have happened that according to your Neo4j database "never happened".
+
+Some examples of problematic scenarios are:
+
+. *Entities being created "a second time"* +
+A node/relationship created between the snapshot and restore operation exists in your CDC application but not in the Neo4j database.
+If the node/relationship is (re-)created in your Neo4j database, your CDC application sees a duplicate node/relationship.
+
+. *"Missing" entities* +
+A node/relationship that was dropped between the snapshot and restore operation does not exist in your CDC application but does now exist in the Neo4j database (again).
+If the node/relationship is updated, your CDC application sees an update to a previously deleted entity.
+
+. *Out of sync attributes* +
+Changes on attributes may have been rolled back in the restore operation.
+For example, a `Movie` node in your Neo4j database may have a rating of 5 stars, whereas the latest change that your CDC application consumed changed the rating from 5 stars to 3 stars.
+
+If your CDC application relies on an internal state it is likely required to restore the state of your CDC application as if it was working with a new database with existing data. For details on this process, see xref:existing-databases.adoc[].
+
+
+[[loss-events]]
+== Loss of change events
+The Neo4j restore procedures replace the existing database with a *new* database.
+This database has a new transaction log and any change identifier (cursor) generated from the old transaction log is not usable with the new database.
+Furthermore, ensure that the transaction log retention setting of the restored database matches that of your existing database.
+
+The following steps outline how to mitigate this issue.
+
+. *Set the database into read-only mode.* +
+. *Take note of the enrichment mode of your database.* +
+. *Verify that your CDC application is caught up and has consumed all changes in the database.*
+. *Stop your CDC application.*
+. *Restore your database from backup.*
+. *Set the restored database into read-only mode.*
+. *Ensure that the restored database has the same enrichment mode value as your existing database.* +
+. *Restart your CDC application, using xref:procedures/index.adoc#earliest[`db.cdc.earliest`] as the starting cursor.*
+. *Enable writes to the restored database.*
+. *Verify that changes are consumed as by your CDC application.*
+
+
+[[inconsistent-elementids]]
+== Inconsistent elementIds
+The elementIds returned by `db.cdc.query` are not guaranteed to be stable across operations that change the database.
+After restoring a backup, new changes to existing elements are published under a new elementId.
+
+It is recommended to use logical/business keys to identify elements instead of elementId, see xref:procedures/elementids-key-properties.adoc[].

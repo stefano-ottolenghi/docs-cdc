@@ -1,10 +1,165 @@
-[role=enterprise-edition]
-[[procedures]]
-= Procedures
+= Use CDC to query changes (procedures)
 :description: This chapter describes change data capture procedures.
 
-This chapter describes the following:
+Once CDC is enabled, there are a number of Cypher procedures that you may use to query changes.
 
-* xref:procedures/query.adoc[]
-* xref:procedures/earliest.adoc[]
-* xref:procedures/current.adoc[]
+CDC works with _change identifiers_, which are essentially pointers to specific transactions.
+The CDC procedures allow you to retrieve specific change identifiers or to query for changes that affected the database _after_ a given change identifier.
+
+The easiest way **to see CDC in action** is by xref:#earliest[retrieving the earliest change identifier], creating a new node in the database, and then xref:#query[querying for changes] using the earliest change identifier.
+
+[TIP]
+====
+**Change identifiers are local to the database they are generated for**, and cannot be used to query changes on another database.
+Keep this in mind when restoring a database from a backup, since the restored database is practically a new database.
+See xref:backup-restore.adoc[restore from backup] for details.
+====
+
+
+[[earliest]]
+== Retrieve the earliest change identifier
+
+The procedure `db.cdc.earliest` returns the change identifier for the earliest available change.
+
+.Query earliest change identifier
+====
+.Query
+[source, cypher, test-exclude-cols=id]
+----
+CALL db.cdc.earliest()
+----
+
+.Result
+[role="queryresult",options="header,footer",cols="1*<m"]
+|===
+| +id+
+| +"A3V16ZaLlUmnipHLFkWrlA0AAAAAAAAABQAAAAAAAAAA"+
+|===
+
+====
+
+
+[[current]]
+== Retrieve the current change identifier
+
+The procedure `db.cdc.current` returns the change identifier for the last committed transaction.
+
+Note that **the returned identifier is exclusive**, meaning it does not include the changes that happened in the transaction it points to.
+
+.Query current change identifier
+====
+.Query
+[source, cypher, test-exclude-cols=id]
+----
+CALL db.cdc.current()
+----
+
+.Result
+[role="queryresult",options="header,footer",cols="1*<m"]
+|===
+| +id+
+| +"A3V16ZaLlUmnipHLFkWrlA0AAAAAAAAABQAAAAAAAAAA"+
+|===
+
+====
+
+
+[[query]]
+== Query changes
+
+The procedure `db.cdc.query` returns the changes that happened to the database _after_ the given change identifier.
+
+[source, syntax]
+----
+db.cdc.query(
+    from =  :: STRING?, // <1>
+    selectors = [] :: LIST? OF MAP? // <2>
+) :: (
+    id :: STRING?, // <3>
+    txId :: INTEGER?, // <4>
+    seq :: INTEGER?, // <5>
+    metadata :: MAP?, // <6>
+    event :: MAP? // <7>
+)
+----
+
+<1> The change identifier to query changes from, either captured from an earlier call to `db.cdc.query` or from one of xref:#current[`db.cdc.current`] or xref:#earliest[`db.cdc.earliest`].
+The default value is `""` (empty string) which is replaced with `db.cdc.current` implicitly.
+**This value is treated as exclusive**, so the results of the query do not include the changes that happened on the transaction corresponding to this change identifier.
+<2> An optional list of xref:procedures/selectors.adoc[selectors] to filter out changes.
+The default is an empty list, which means _all_ changes are returned, without any filtering.
+<3> The unique change identifier associated with each change record.
+Each of these can be used for further `db.cdc.query` calls.
+<4> A number identifying which transaction the change happened in, unique in combination with `seq`.
+Transaction identifiers are not continuous (some transactions, such as system and schema commands, are not recorded in change data capture and cause gaps in the transaction identifiers).
+<5> A number used for ordering changes that happened in the same transaction.
+Note that the order of changes observed in the output does not necessarily correspond to the order in which changes were applied during the transaction.
+<6> A map of values containing transaction metadata.
+This is the same for all of the changes in a single transaction.
+For a detailed description of the metadata fields, see xref:procedures/output-schema.adoc[].
+<7> The retrieved changes on the affected entity.
+For a detailed description of the change event, see xref:procedures/output-schema.adoc[].
+
+.Query for changes after creation of a `:Person` node
+====
+.Query
+[source, cypher, test-fail=Neo.ClientError.ChangeDataCapture.InvalidIdentifier]
+----
+CALL db.cdc.query("A3V16ZaLlUmnipHLFkWrlA0AAAAAAAAABAAAAAAAAAAA")
+----
+
+.Result
+[role="queryresult",options="header,footer",cols="3m,1m,1m,5a,5a"]
+|===
+| id | txId | seq | metadata | event
+
+| "A3V16ZaLlUmnipHLFkWrlA0AAAAAAAAABQAAAAAAAAAA"
+| 4
+| 0
+| [source, json, role=nocollapse]
+----
+{
+  "txStartTime": "2024-04-03T06:28:19.630000000Z",
+  "databaseName": "neo4j",
+  "executingUser": "neo4j",
+  "authenticatedUser": "neo4j",
+  "connectionServer": "172.17.0.2:7687",
+  "connectionType": "bolt",
+  "serverId": "20668765",
+  "captureMode": "FULL",
+  "connectionClient": "172.17.0.1:41888",
+  "txCommitTime": "2024-04-03T06:28:19.651000000Z",
+  "txMetadata": {
+    "app": "neo4j-browser_v5.15.0",
+    "type": "user-direct"
+  }
+}
+----
+| [source, json, role=nocollapse]
+----
+{
+  "elementId": "4:68262997-88e3-4518-83ec-d944674609f4:8",
+  "operation": "c",
+  "keys": {
+
+  },
+  "labels": [
+    "Person"
+  ],
+  "state": {
+    "after": {
+      "labels": [
+        "Person"
+      ],
+      "properties": {
+        "name": "Stefano"
+      }
+    },
+    "before": null
+  },
+  "eventType": "n"
+}
+----
+|===
+
+====
