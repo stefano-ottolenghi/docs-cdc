@@ -137,7 +137,7 @@ Actual disk usage depends on the application, data model and transaction charact
 
 Since Neo4j stores change data capture information inside transaction log entries, you should configure the transaction log retention period based on your application requirements.
 
-The number of hours or days to keep the transaction log is highly dependent on your CDC use case, but as a general rule of thumb you can pick the period based on downtime tolerance of your downstream application so that the changes you have not yet processed are not pruned.
+The number of hours or days to keep the transaction log depends on your CDC use case, but as a general rule of thumb you can pick the period based on downtime tolerance of your downstream application so that the changes you have not yet processed are not pruned.
 
 For more details on transaction log retention and how to configure it, see link:{neo4j-docs-base-uri}/operations-manual/{page-version}/configuration/transaction-logs/#transaction-logging-log-retention[Operations Manual -> Configuration -> Transaction Log].
 
