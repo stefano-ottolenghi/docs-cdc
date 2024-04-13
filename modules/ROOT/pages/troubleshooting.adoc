@@ -8,12 +8,12 @@ You can find a list of error codes and causes that are used by change data captu
 === Neo.DatabaseError.ChangeDataCapture.Disabled
 
 Change data capture is currently disabled for this database.
-You need to enable CDC to make use of CDC procedures, see xref:get-started/on-prem.adoc[].
+You need to enable CDC to make use of CDC procedures, see xref:get-started/self-managed.adoc[].
 
 === Neo.DatabaseError.ChangeDataCapture.ScanFailure
 
 CDC cannot find the transaction log entry for the change identifier provided.
-This is likely because of your xref:get-started/on-prem.adoc#log-retention[log retention] settings.
+This is likely because of your xref:get-started/self-managed.adoc#log-retention[log retention] settings.
 Review your settings and increase the log retention period to fit your requirements.
 
 === Neo.ClientError.ChangeDataCapture.InvalidIdentifier
