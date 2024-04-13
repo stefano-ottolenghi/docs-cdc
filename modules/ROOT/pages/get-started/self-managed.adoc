@@ -1,4 +1,4 @@
-= Enable CDC on self-hosted instances (on-prem)
+= Enable CDC on self-managed instances
 
 
 include::partial$get-started.adoc[tags=intro]
