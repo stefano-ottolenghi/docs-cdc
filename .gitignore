@@ -20,6 +20,7 @@
 .java-version
 .mailmap
 .project
+.package-lock.json
 .scala_dependencies
 .settings
 .shell_history
