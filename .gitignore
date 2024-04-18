@@ -20,7 +20,6 @@
 .java-version
 .mailmap
 .project
-.package-lock.json
 .scala_dependencies
 .settings
 .shell_history
@@ -29,6 +28,7 @@ Thumbs.db
 bin/teamcity/
 build/
 devenv.local
+package-lock.json
 shared/
 src/main/_common-and-old/
 tags
