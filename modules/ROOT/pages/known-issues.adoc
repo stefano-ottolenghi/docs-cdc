@@ -1,23 +1,23 @@
 = Known Issues
 :description: This chapter describes known issues related to CDC.
 
-== Neo4j 5.18
-As of Neo4j 5.18 the CDC feature has the following known issues.
 
-=== Unstable elementId
-CDC returns the same elementId as provided by the link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/functions/scalar/#functions-elementid[elementId()] function.
-This elementId is not stable through processes that change the underlying database such as:
+== Unstable elementId
+CDC returns the same `elementId` as provided by the link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/functions/scalar/#functions-elementid[`elementId()`] Cypher function.
+This elementId is not stable through processes that change the database without going through the transaction layer, such as:
 
 - Restoring from backup
-- Copying the database to a new name or location.
-- Pausing and resuming the database in Neo4j Aura.
+- Importing through CLI commands
+- Copying the database to a new name or location
+- Pausing and resuming the database in Neo4j Aura
 
-This means that performing any of the listed actions causes new changes to the same element to be transmitted with a different elementId.
+Performing any of the listed actions causes new changes to the same element to be transmitted with a different `elementId`.
 
-It is recommended that logical / business keys are used to identify elements.
-See xref:procedures/elementids-key-properties.adoc[] for details on logical / business keys.
+To avoid the issue, you should use xref:procedures/elementids-key-properties.adoc[logical/business keys] rather than `elementId` to identify elements.
 
-=== Unstable changeId
-The change identifier which CDC uses to track the location in the transaction log has similar issues as the elementId.
+
+== Unstable change identifier
+
+The change identifier that CDC uses to track the location in the transaction log has similar issues as the `elementId`.
 The actions listed under xref:_unstable_elementid[] also cause change identifiers to become invalid.
 After performing any of these actions it might be required to restart querying changes from xref:procedures/index.adoc#current[db.cdc.current] or xref:procedures/index.adoc#earliest[db.cdc.earliest].

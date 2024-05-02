@@ -11,11 +11,7 @@ ifdef::backend-pdf[]
 
 endif::[]
 
-Change Data Capture (CDC) allows you to capture and track changes to your database in real-time, enabling you to keep your other data sources up-to-date with Neo4j.
+Change Data Capture (CDC) allows you to capture and track changes to your database in real-time, enabling you to keep your other data sources up to date with Neo4j.
 With CDC, you can identify and respond to changes (create, update, and delete) on nodes and relationships as they happen, and integrate these changes into other systems and applications.
 
 The documentation guides you through the process of setting up CDC, configuring it to capture the changes, and querying those changes for further processing, such as replicating to another system.
-
-== Availability
-
-The CDC feature is available as a public beta with Neo4j Enterprise Edition 5.13 and AuraDB Enterprise.

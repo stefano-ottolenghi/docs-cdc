@@ -62,7 +62,7 @@ SHOW DATABASES YIELD name, options
 
 === Disable CDC
 
-To disable CDC on a database, either set `txLogEnrichment` explicitly to `OFF` or remove it altogether.
+To disable CDC on a database, either set the option `txLogEnrichment` explicitly to `OFF` or remove it altogether.
 
 .Using set option clause
 [source, cypher]
@@ -97,8 +97,8 @@ include::partial$get-started.adoc[tags=security]
 [[disk-size]]
 === Disk size
 
-Enabling change data capture on a database causes more data to be written into transaction log files.
-This means that the log files are rotated more frequently and log pruning is activated sooner (based on your configuration).
+With CDC enabled, more data gets written into transaction log files for that database.
+As a result, transaction log files are rotated and pruned more frequently.
 The disk may run out of space if the disk size for transaction log storage is limited, so ensure that you have plenty of available space.
 
 In particular, **plan for a 50% increase in data written to the transaction log with `DIFF` CDC mode, and 75% for `FULL` CDC mode.**
@@ -109,15 +109,17 @@ Actual disk usage depends on the application, data model and transaction charact
 === Transaction log retention
 
 Since CDC information is stored in transaction log entries, the time for which the logs are retained dictates how much back in time your application may query for CDC data.
+As a general rule of thumb, you can pick a period greater or equal to the downtime tolerance of your downstream application, so that the changes don't get pruned before the application has had time to process them.
 
-The number of hours or days to keep the transaction log depends on your use case, but as a general rule of thumb you can pick a period greater or equal to the downtime tolerance of your downstream application, so that the changes don't get pruned before the application has had time to process them.
+You can control the transaction log retention period through the configuration setting `db.tx_log.rotation.retention_policy`. +
+For more details on transaction log files and how to configure them, see link:{neo4j-docs-base-uri}/operations-manual/{page-version}/configuration/transaction-logs/[Transaction logging].
 
 .Transaction log configuration and CDC behavior
 ====
-This example shows the behavior that results from a given configuration.
+This example shows the behavior that results from a given server configuration.
 
-`db.tx_log.rotation.size = 256M` +
 `db.tx_log.rotation.retention_policy = 2G 1Day` +
+`db.tx_log.rotation.size = 256M` +
 `db.checkpoint.interval.time = 15m` +
 `db.checkpoint.interval.tx = 100000`
 
@@ -131,9 +133,6 @@ In other words, the server keeps _at most_ 2GB worth of transaction logs, as lon
 As long as they are all more recent than 1 day, the server keeps _at least_ `2GB - 256MB` worth of transaction logs (256MB are always needed for the current log file to grow into).
 In case large transactions resulted in log files larger than 256MB, the minimum retained size of logs may be smaller than `2GB - 256MB`.
 ====
-
-For more details on transaction log files and how to configure them, see link:{neo4j-docs-base-uri}/operations-manual/{page-version}/configuration/transaction-logs/[Transaction logging].
-
 
 [[non-tx-log-changes]]
 === Unrecorded changes

@@ -1,7 +1,8 @@
 = Troubleshooting
 :description: This chapter describes common change data capture related errors.
 
-You can find a list of error codes and causes that are used by change data capture procedures.
+This page contains a list of CDC error codes together with their likely causes.
+
 
 == Error codes
 
@@ -10,11 +11,13 @@ You can find a list of error codes and causes that are used by change data captu
 Change data capture is currently disabled for this database.
 You need to enable CDC to make use of CDC procedures, see xref:get-started/self-managed.adoc[].
 
+
 === Neo.DatabaseError.ChangeDataCapture.ScanFailure
 
 CDC cannot find the transaction log entry for the change identifier provided.
 This is likely because of your xref:get-started/self-managed.adoc#log-retention[log retention] settings.
 Review your settings and increase the log retention period to fit your requirements.
+
 
 === Neo.ClientError.ChangeDataCapture.InvalidIdentifier
 

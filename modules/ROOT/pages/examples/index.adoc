@@ -13,11 +13,11 @@ The examples are provided separately for each of the supported link:https://neo4
 [[cursor-management]]
 == Cursor management and server side filtering
 
-The change identifiers returned from the CDC procedures are valid until Neo4j rotates the transaction log.
+The change identifiers returned from the CDC procedures are valid until the server rotates the transaction log.
 
 Usually the change cursor stays valid, since each call to `db.cdc.query` updates the cursor.
 However, very strict selectors may cause `db.cdc.query` to not return any changes.
-This can in extreme cases lead to the cursor not being updated in time before the transaction log are rotated.
+This can in extreme cases lead to the cursor not being updated in time before the transaction log is rotated.
 To avoid this, the code examples update the cursor to `db.cdc.current` if `db.cdc.query` returns empty.
 Note that `db.cdc.current` needs to be called and stored before calling `db.cdc.query` for this to work.
 

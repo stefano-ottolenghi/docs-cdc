@@ -19,8 +19,8 @@ CALL db.cdc.query($previousChangeId, [{
 ----
 
 == Selecting entities based on changed properties
-Changes can be filtered to only include those where a certain property or properties are changed.
-Note that if a list of properties is provided, for the change to be selected, all of the provided properties need to be changed in the same change event.
+Changes can be filtered to only include those in which certain properties are changed.
+If a list of properties is provided, all of the provided properties must have been changed in the same change event.
 
 .Query entities where a specific property is changed
 [source, cypher]
@@ -50,7 +50,7 @@ CALL db.cdc.query($previousChangeId, [{
 ----
 
 == Selecting entities based on change metadata
-Changes can be filtered to only include those where the transaction was carried out by a particular user or certain metadata property or properties have been associated with that transaction.
+Changes can be filtered to only include those in which the transaction matches specific metadata attributes.
 
 .Query entities changed by a particular user
 [source, cypher]
@@ -82,10 +82,11 @@ CALL db.cdc.query($previousChangeId, [{
 }])
 ----
 
-== Selecting nodes/relationships by element id
-Changes can be filtered to a specific element id.
+== Selecting nodes/relationships by elementId
+Changes can be filtered to a specific elementId.
 This might be useful when you are interested in changes made to a specific node or relationship.
-See link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/functions/scalar/#functions-elementid[Cypher Manual -> Functions -> Scalar functions] for more information on getting element ids of existing entities.
+See link:{neo4j-docs-base-uri}/cypher-manual/{page-version}/functions/scalar/#functions-elementid[Cypher Manual -> elementId] for more information on getting elementIds of existing entities.
+Avoid using elementId in favor of business keys -- see xref:procedures/elementids-key-properties.adoc[] for details.
 
 .Query node changes
 [source, cypher]
@@ -153,7 +154,7 @@ CALL db.cdc.query($previousChangeId, [{
 [NOTE]
 ====
 The query above only returns changes on nodes that have *both* labels either before or after the change.
-In order to get changes on nodes with either label, two separate selectors have to be specified.
+In order to get changes on nodes with _either_ label, two separate selectors have to be specified.
 See xref:procedures/selectors.adoc#combining-selectors[combining selectors] for details.
 ====
 
@@ -172,7 +173,7 @@ CALL db.cdc.query($previousChangeId, [{
 == Selecting relationships by start/end nodes
 Relationship changes can be selected based on their start and end nodes.
 
-.Query relationships that has a start node with a specific label
+.Query relationships having start node with a specific label
 [source, cypher]
 ----
 CALL db.cdc.query($previousChangeId, [{
@@ -183,7 +184,7 @@ CALL db.cdc.query($previousChangeId, [{
 }])
 ----
 
-.Query relationships that is between specific labels
+.Query relationships between specific labels
 [source, cypher, role="nocollapse"]
 ----
 CALL db.cdc.query($previousChangeId, [{
@@ -197,7 +198,7 @@ CALL db.cdc.query($previousChangeId, [{
 }])
 ----
 
-.Query relationships that is between specific labels and with a specific type
+.Query relationships between specific labels and with a specific type
 [source, cypher, role="nocollapse"]
 ----
 CALL db.cdc.query($previousChangeId, [{
@@ -212,7 +213,7 @@ CALL db.cdc.query($previousChangeId, [{
 }])
 ----
 
-.Query relationships that involves a specific node
+.Query relationships involving a specific node
 [source, cypher, role="nocollapse"]
 ----
 CALL db.cdc.query($previousChangeId, [{

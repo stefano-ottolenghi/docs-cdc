@@ -6,8 +6,6 @@ Once CDC is enabled, there are a number of Cypher procedures that you may use to
 CDC works with _change identifiers_, which are essentially pointers to specific transactions.
 The CDC procedures allow you to retrieve specific change identifiers or to query for changes that affected the database _after_ a given change identifier.
 
-The easiest way **to see CDC in action** is by xref:#earliest[retrieving the earliest change identifier], creating a new node in the database, and then xref:#query[querying for changes] using the earliest change identifier.
-
 [TIP]
 ====
 **Change identifiers are local to the database they are generated for**, and cannot be used to query changes on another database.
@@ -44,7 +42,7 @@ CALL db.cdc.earliest()
 
 The procedure `db.cdc.current` returns the change identifier for the last committed transaction.
 
-Note that **the returned identifier is exclusive**, meaning it does not include the changes that happened in the transaction it points to.
+Note that **the returned identifier is exclusive**: it does not include the changes that happened in the transaction it points to.
 
 .Query current change identifier
 ====
@@ -163,3 +161,106 @@ CALL db.cdc.query("A3V16ZaLlUmnipHLFkWrlA0AAAAAAAAABAAAAAAAAAAA")
 |===
 
 ====
+
+
+[[earliest-change-event]]
+== Retrieve the earliest change event
+
+The procedure `db.cdc.earliest` returns the change _identifier_ for the earliest available change, but not the associated change _event_ information.
+To retrieve the earliest change event, you can feed the earliest change ID into `db.cdc.query` and limit the result to one.
+Change events are already sorted chronologically so no sorting is needed.
+
+[source, cypher]
+----
+CALL db.cdc.earliest() YIELD id AS earliestId
+CALL db.cdc.query(earliestId) YIELD event, metadata
+RETURN event, metadata LIMIT 1
+----
+
+
+[[latest-change-event]]
+== Retrieve the most recent change event
+
+To retrieve the most recent change event, you can feed the earliest change ID into `db.cdc.query`, reverse-sort them, and limit the result to one.
+
+[source, cypher]
+----
+CALL db.cdc.earliest() YIELD id AS earliestId
+CALL db.cdc.query(earliestId) YIELD event, metadata
+RETURN event, metadata ORDER BY metadata.txCommitTime DESC LIMIT 1
+----
+
+[NOTE]
+This query can be very slow, as it needs to scan through all change events.
+
+
+== A minimal working example
+
+The easiest way **to see CDC in action** is by xref:#current[retrieving the current change identifier], creating a new node in the database, and then xref:#query[querying for changes] using the previous change identifier.
+The operations must happen in three separate transactions.
+
+.Transaction 1 -- Retrieve current change ID
+[source, cypher]
+----
+CALL db.cdc.current() YIELD id AS currentId
+// currentId = 'BaQswf9NV0b7qicwDdh7vfwAAAAAAAAD83__________AAABjzfm4bM'
+----
+
+.Transaction 2 -- Create new `Person` node
+[source, cypher]
+----
+CREATE (:Person:Hero {name: 'Batman', color: 'black'})
+----
+
+.Transaction 3 -- Retrieve change event for `Person` node creation
+[source, cypher, test-result-skip]
+----
+WITH 'BaQswf9NV0b7qicwDdh7vfwAAAAAAAAD83__________AAABjzfm4bM=' AS previousId
+CALL db.cdc.query(previousId) YIELD event, metadata RETURN event, metadata
+----
+
+.Result
+[role="queryresult",options="header,footer",cols="a,a"]
+|===
+| event | metadata
+
+| [source, json, role=nocollapse]
+----
+{
+  "elementId": "4:a42cc1ff-4d57-46fb-aa27-300dd87bbdfc:55135",
+  "keys": {}, "state": {
+    "before": NULL,
+    "after": {
+      "properties": {
+        "name": "Batman",
+        "color": "black"
+      },
+      "labels": ["Person", "Hero"]
+    }
+  },
+  "eventType": "n",
+  "operation": "c",
+  "labels": ["Person", "Hero"]
+}
+----
+| [source, json, role=nocollapse]
+----
+{
+  "txMetadata": {
+    "app": "neo4j-browser_v5.15.0",
+    "type": "user-direct"
+  },
+  "executingUser": "neo4j",
+  "databaseName": "cdc",
+  "connectionClient": "127.0.0.1:48008",
+  "authenticatedUser": "neo4j",
+  "captureMode": "DIFF",
+  "connectionServer": "127.0.0.1:7687",
+  "connectionType": "bolt",
+  "serverId": "20668765",
+  "txStartTime": 2024-05-02T06:13:08.521Z,
+  "txCommitTime": 2024-05-02T06:13:08.551Z
+}
+----
+
+|===

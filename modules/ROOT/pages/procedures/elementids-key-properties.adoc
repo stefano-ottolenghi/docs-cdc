@@ -37,21 +37,21 @@ Whenever a change happens on a node with `Person` label with `firstName`, `lastN
 [source, json]
 ----
 {
-    //...
-    "event": {
-        "keys": {
-            "Person": [
-                {
-                    "firstName": "john",
-                    "lastName": "doe"
-                },
-                {
-                    "ssn": "X123456"
-                }
-            ]
+  //...
+  "event": {
+    "keys": {
+      "Person": [
+        {
+          "firstName": "john",
+          "lastName": "doe"
+        },
+        {
+          "ssn": "X123456"
         }
+      ]
     }
-    //...
+  }
+  //...
 }
 ----
 
@@ -60,17 +60,17 @@ Likewise, whenever a change happens on a node with `Employee` label with `id` pr
 [source, json]
 ----
 {
-    //...
-    "event": {
-        "keys": {
-            "Employee": [
-                {
-                    "id": 1001
-                }
-            ]
+  //...
+  "event": {
+    "keys": {
+      "Employee": [
+        {
+          "id": 1001
         }
+      ]
     }
-    //...
+  }
+  //...
 }
 ----
 
@@ -79,26 +79,26 @@ If, on the other hand, the changed node has both `Person` and `Employee` labels 
 [source, json]
 ----
 {
-    //...
-    "event": {
-        "keys": {
-            "Person": [
-                {
-                    "firstName": "john",
-                    "lastName": "doe"
-                },
-                {
-                    "ssn": "Y654321"
-                }
-            ],
-            "Employee": [
-                {
-                    "id": 1001
-                }
-            ]
+  //...
+  "event": {
+    "keys": {
+      "Person": [
+        {
+          "firstName": "john",
+          "lastName": "doe"
+        },
+        {
+          "ssn": "Y654321"
         }
+      ],
+      "Employee": [
+        {
+          "id": 1001
+        }
+      ]
     }
-    //...
+  }
+  //...
 }
 ----
 
@@ -107,7 +107,7 @@ For a full description of change record schema, see xref:procedures/output-schem
 [NOTE]
 ====
 Although the preferred way of specifying node key properties is creating a _node key_ constraint, the same can be achieved using both _unique node property_ and _node property existence_ constraints on the same set of properties. +
-For Change Data Capture, it doesn't matter whether the constraints were created in one way or the other.
+For CDC, it doesn't matter whether the constraints were created in one way or the other.
 
 
 ////
@@ -146,62 +146,62 @@ Whenever a change happens on a relationship of type `MARRIED_TO` with `registerI
 [source, json]
 ----
 {
-    //...
-    "event": {
-        "keys": [
-            {
-                "registerId": 1125
-            },
-            {
-                "official": "Alice Roberts"
-            }
-        ]
-    }
-    //...
+  //...
+  "event": {
+    "keys": [
+      {
+        "registerId": 1125
+      },
+      {
+        "official": "Alice Roberts"
+      }
+    ]
+  }
+  //...
 }
 ----
 
 If the relationship's start and end nodes correspond to nodes with node key constraint, those property values are also included in the change event.
 
-[source, json, role=nocollapse]
+[source, json]
 ----
 {
-    //...
-    "event": {
-        "start": {
-            "elementId": "<element-id>",
-            "labels": ["Person"],
-            "keys": {
-                "Person": [
-                    {
-                        "firstName": "john",
-                        "lastName": "doe"
-                    }
-                ]
-            }
-        },
-        "end": {
-            "elementId": "<element-id>",
-            "labels": ["Person"],
-            "keys": {
-                "Person": [
-                    {
-                        "firstName": "mary",
-                        "lastName": "doe"
-                    }
-                ]
-            }
-        },
-        "keys": [
-            {
-                "registerId": 1125
-            },
-            {
-                "official": "Alice Roberts"
-            }
+  //...
+  "event": {
+    "start": {
+      "elementId": "<element-id>",
+      "labels": ["Person"],
+      "keys": {
+        "Person": [
+          {
+            "firstName": "john",
+            "lastName": "doe"
+          }
         ]
-    }
-    //...
+      }
+    },
+    "end": {
+      "elementId": "<element-id>",
+      "labels": ["Person"],
+      "keys": {
+        "Person": [
+          {
+            "firstName": "mary",
+            "lastName": "doe"
+          }
+        ]
+      }
+    },
+    "keys": [
+      {
+        "registerId": 1125
+      },
+      {
+        "official": "Alice Roberts"
+      }
+    ]
+  }
+  //...
 }
 ----
 

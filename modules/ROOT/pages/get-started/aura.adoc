@@ -6,8 +6,7 @@ include::partial$get-started.adoc[tags=intro]
 [[toggle-cdc-mode]]
 == Enable/Toggle CDC mode
 
-Admin users can tweak the CDC mode for a database using the Aura instance options.
-To access the setting, access the instance options through the three dots on the instance card and select *Edit CDC Enrichment Mode*.
+Admin users can tweak the CDC mode for a database through the setting  *Edit CDC Mode*, accessible via the Aura instance options.
 Non-admin users may view the current CDC mode, but may not edit it.
 
 [IMPORTANT]
@@ -20,8 +19,9 @@ Your CDC application must be able to deal with the change of format.
 [[disable-cdc]]
 == Disable CDC
 
-To disable CDC on a database, access the instance options through the three dots on the instance card, select *Edit CDC Enrichment Mode*, and set it to `OFF`.
-Only admin users can tweak the CDC mode.
+Admin users can disable CDC for a database through the setting  *Edit CDC Mode*, accessible via the Aura instance options.
+Set the mode to `OFF`.
+Only admin users can disable CDC mode for a database.
 
 [WARNING]
 ====
