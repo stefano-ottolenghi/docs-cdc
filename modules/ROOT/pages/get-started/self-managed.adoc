@@ -1,4 +1,4 @@
-= CDC on self-managed instances
+= CDC on Neo4j DBMS
 
 
 include::partial$get-started.adoc[tags=intro]

@@ -1,4 +1,4 @@
-= CDC on Aura instances (cloud)
+= CDC on Neo4j Aura
 
 include::partial$get-started.adoc[tags=intro]
 
