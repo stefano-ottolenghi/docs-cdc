@@ -35,16 +35,16 @@ Furthermore, ensure that the transaction log retention setting of the restored d
 
 The following steps outline how to mitigate this issue.
 
-. *Set the database into read-only mode.* +
-. *Take note of the enrichment mode of your database.* +
-. *Verify that your CDC application is caught up and has consumed all changes in the database.*
-. *Stop your CDC application.*
-. *Restore your database from backup.*
-. *Set the restored database into read-only mode.*
-. *Ensure that the restored database has the same enrichment mode value as your existing database.* +
-. *Restart your CDC application, using xref:procedures/index.adoc#earliest[`db.cdc.earliest`] as the starting cursor.*
-. *Enable writes to the restored database.*
-. *Verify that changes are consumed as by your CDC application.*
+. Set the database into read-only mode.
+. Take note of the CDC mode of your database.
+. Verify that your CDC application is caught up and has consumed all changes in the database.
+. Stop your CDC application.
+. Restore your database from backup.
+. Set the restored database into read-only mode.
+. Ensure that the restored database has the same CDC mode value as your existing database.
+. Restart your CDC application, using xref:procedures/index.adoc#earliest[`db.cdc.earliest`] as the starting cursor.
+. Enable writes to the restored database.
+. Verify that changes are consumed as by your CDC application.
 
 
 [[inconsistent-elementids]]

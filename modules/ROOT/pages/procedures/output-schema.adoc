@@ -70,7 +70,7 @@ Note that the order of changes observed in the output does not necessarily corre
 <4> The user that performed this change.
 May be different from `authenticatedUser` when using link:https://neo4j.com/docs/operations-manual/current/authentication-authorization/dbms-administration/#access-control-dbms-administration-impersonation[impersonation].
 <5> The authenticated user when this change was performed.
-<6> The transaction log enrichment mode at the time this change was captured.
+<6> The transaction log CDC mode at the time this change was captured.
 <7> The client's address (usually IP address and port, but it might change based on protocol).
 <8> The identifier of the server that performed this change.
 See link:{neo4j-docs-base-uri}/operations-manual/{page-version}/clustering/servers/#_listing_servers[Operations Manual -> Clustering -> Managing servers in a cluster] for more information on servers.
@@ -86,18 +86,18 @@ This requires key constraints defined on the changed entities, see xref:procedur
 <17> Type of the changed entity: `n` for nodes and `r` for relationships.
 <18> A map describing the state of the entity before the change.
 This field is always `NULL` for create events.
-When on `DIFF` enrichment mode, it is limited to the properties and labels of the entity that have changed.
-This field always contains the full state of the entity for delete events, regardless of whether the enrichment mode is set to `DIFF` or `FULL`.
+When on `DIFF` CDC mode, it is limited to the properties and labels of the entity that have changed.
+This field always contains the full state of the entity for delete events, regardless of whether the CDC mode is set to `DIFF` or `FULL`.
 <19> A map describing the state of the entity after the change.
 This field is always `NULL` for delete events.
-When on `DIFF` enrichment mode, it is limited to the properties and labels of the entity that have changed.
-This field always contains the full state of the entity for create events, regardless of whether the enrichment mode is set to `DIFF` or `FULL`.
+When on `DIFF` CDC mode, it is limited to the properties and labels of the entity that have changed.
+This field always contains the full state of the entity for create events, regardless of whether the CDC mode is set to `DIFF` or `FULL`.
 <20> A map of properties of the entity after the change.
 <21> List of node labels after the change was applied.
-When on `DIFF` enrichment mode, it is limited to the changed labels.
+When on `DIFF` CDC mode, it is limited to the changed labels.
 <22> Type of the operation: `c` for creates, `u` for updates, `d` for deletions.
 <23> List of node labels before the change was applied.
-It contains the complete set of labels regardless of the enrichment mode.
+It contains the complete set of labels regardless of the CDC mode.
 
 
 == Relationship changes

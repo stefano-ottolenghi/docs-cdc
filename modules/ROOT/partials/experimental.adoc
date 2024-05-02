@@ -1,4 +1,0 @@
-[CAUTION]
-====
-This feature has been released as a public beta in AuraDB Enterprise October Release and Neo4j Enterprise Edition 5.13 and breaking changes are likely to be introduced before it is made generally available (GA).
-====

@@ -1,0 +1,71 @@
+= CDC on Aura instances (cloud)
+
+include::partial$get-started.adoc[tags=intro]
+
+
+[[toggle-cdc-mode]]
+== Enable/Toggle CDC mode
+
+Admin users can tweak the CDC mode for a database using the Aura instance options.
+To access the setting, access the instance options through the three dots on the instance card and select *Edit CDC Enrichment Mode*.
+Non-admin users may view the current CDC mode, but may not edit it.
+
+[IMPORTANT]
+====
+Modifying CDC mode from `DIFF` to `FULL` or vice-versa immediately changes the  xref:procedures/output-schema.adoc[structure of captured changes].
+Your CDC application must be able to deal with the change of format.
+====
+
+
+[[disable-cdc]]
+== Disable CDC
+
+To disable CDC on a database, access the instance options through the three dots on the instance card, select *Edit CDC Enrichment Mode*, and set it to `OFF`.
+Only admin users can tweak the CDC mode.
+
+[WARNING]
+====
+Disabling CDC immediately breaks the continuity of change events.
+**Change identifiers generated before disabling can no longer be used and, even if CDC is re-enabled, the previously-generated change identifiers remain invalid.**
+Disabling and then re-enabling CDC is equivalent to enabling it for the first time: there is no memory of previous changes.
+====
+
+*CDC is automatically disabled for:*
+
+* New instances
+* Cloned instances
+* Paused instances
+* Instances restored from a snapshot
+
+
+[[key-considerations]]
+== Key considerations
+
+
+[[pause-resume]]
+=== Paused/Resumed databases
+Although it is possible to pause a database that has CDC mode set to `DIFF` or `FULL`, **the CDC mode gets set to `OFF` when the database is resumed**.
+
+When an instance is resumed, it behaves similarly to https://neo4j.com/docs/cdc/current/backup-restore/[restoring a snapshot].
+
+
+[[security]]
+=== Security
+
+include::partial$get-started.adoc[tags=security]
+
+
+[[log-retention]]
+=== Transaction log retention
+
+Since CDC information is stored in transaction log entries, the time for which the logs are retained dictates how much back in time your application may query for CDC data.
+
+As new transactions come in, the server writes them to a log file. When that file exceeds 256MB, it creates a new file and continues writing there (transactions are never broken across files though, so if the current log is 255MB when a new 5MB transaction comes in, the file will grow to 260MB before rotating to a new file).
+
+Every 15 minutes _or_ 100000 transactions (whichever happens first), the server goes through the transaction log files from newer to oldest.
+When the sum of the scanned files is greater than 2GB, all subsequent files are deleted, including the latest scanned one, so that the total size is again below 2GB.
+Files older than 1 day are also deleted.
+
+In other words, the server keeps _at most_ 2GB worth of transaction logs, as long as they are all more recent than 1 day.
+Regarding size, the server keeps _at least_ `2GB - 256MB` worth of transaction logs (256MB are always needed for the current log file to grow into) -- some may however be deleted if they are older than 1 day.
+In case large transactions made log files grow larger than 256MB, the minimum total retained size may be smaller than `2GB - 256MB`.

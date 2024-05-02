@@ -36,7 +36,7 @@ asciidoc:
   - "@neo4j-antora/antora-add-notes"
   - "@neo4j-antora/antora-table-footnotes"
   attributes:
-    page-role: beta enterprise-edition aura-db-enterprise
+    page-role: enterprise-edition aura-db-enterprise
     page-theme: docs
     page-type: Docs
     page-search-type: Docs

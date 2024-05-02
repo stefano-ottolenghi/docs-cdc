@@ -1,13 +1,13 @@
-= Enable CDC on self-managed instances
+= CDC on self-managed instances
 
 
 include::partial$get-started.adoc[tags=intro]
 
 
-[[set-enrichment-mode]]
-== Set the enrichment mode
+[[tweak-mode]]
+== Toggle CDC mode
 
-=== Create a database with log enrichment enabled
+=== Create a database with CDC enabled
 
 To create a new database with CDC enabled, use the link:https://www.neo4j.com/docs/operations-manual/current/database-administration/standard-databases/manage-databases/#manage-databases-create[`CREATE DATABASE`] Cypher command and set the option `txLogEnrichment` to either `FULL` or `DIFF`.
 
@@ -17,9 +17,9 @@ To create a new database with CDC enabled, use the link:https://www.neo4j.com/do
 CREATE DATABASE <dbName> IF NOT EXISTS OPTIONS {txLogEnrichment: "FULL"}
 ----
 
-=== Modify a database's log enrichment mode
+=== Modify a database's CDC mode
 
-To tweak the enrichment mode on an existing database, use the https://www.neo4j.com/docs/operations-manual/current/database-administration/standard-databases/manage-databases/#administration-databases-alter-database[`ALTER DATABASE`] Cypher command and set the option `txLogEnrichment` to either `FULL` or `DIFF`.
+To tweak the CDC mode on an existing database, use the https://www.neo4j.com/docs/operations-manual/current/database-administration/standard-databases/manage-databases/#administration-databases-alter-database[`ALTER DATABASE`] Cypher command and set the option `txLogEnrichment` to either `FULL` or `DIFF`.
 
 .Query
 [source, cypher]
@@ -29,14 +29,14 @@ ALTER DATABASE <dbName> SET OPTION txLogEnrichment "DIFF"
 
 [IMPORTANT]
 ====
-Modifying enrichment mode from `DIFF` to `FULL` or viceversa immediately changes the  xref:procedures/output-schema.adoc[structure of captured changes].
-Your CDC application must be able to deal with the different format.
+Modifying CDC mode from `DIFF` to `FULL` or viceversa immediately changes the  xref:procedures/output-schema.adoc[structure of captured changes].
+Your CDC application must be able to deal with the change of format.
 ====
 
-[[get-enrichment-mode]]
-=== Get a database's log enrichment mode
+[[get-cdc-mode]]
+=== Get a database's CDC mode
 
-To see what value the enrichment mode of a database is, use the link:https://neo4j.com/docs/operations-manual/current/database-administration/standard-databases/manage-databases/#manage-databases-list[`SHOW DATABASES`] Cypher command.
+To see what value the CDC mode of a database is, use the link:https://neo4j.com/docs/operations-manual/current/database-administration/standard-databases/manage-databases/#manage-databases-list[`SHOW DATABASES`] Cypher command.
 
 .Query
 [source, cypher]
@@ -60,9 +60,9 @@ SHOW DATABASES YIELD name, options
 |===
 
 
-=== Disable log enrichment
+=== Disable CDC
 
-To disable log enrichment on a database, either set `txLogEnrichment` explicitly to `OFF` or remove it altogether.
+To disable CDC on a database, either set `txLogEnrichment` explicitly to `OFF` or remove it altogether.
 
 .Using set option clause
 [source, cypher]
@@ -78,47 +78,20 @@ ALTER DATABASE <dbName> REMOVE OPTION txLogEnrichment
 
 [WARNING]
 ====
-Disabling enrichment immediately breaks the continuity of change events.
-**Change identifiers generated before disabling can no longer be used and, even if enrichment is re-enabled, the previously-generated change identifiers remain invalid.**
+Disabling CDC immediately breaks the continuity of change events.
+**Change identifiers generated before disabling can no longer be used and, even if CDC is re-enabled, the previously-generated change identifiers remain invalid.**
 Disabling and then re-enabling CDC is equivalent to enabling it for the first time: there is no memory of previous changes.
 ====
 
-== Points to consider
+
+[[key-considerations]]
+== Key considerations
+
 
 [[security]]
 === Security
 
-CDC returns all changes in the database and is not limited to the entities which a certain user is allowed to access.
-In order to prevent unauthorized access, the procedure xref:procedures/index.adoc#query[`db.cdc.query`] requires admin privileges and should be configured for least privilege access.
-
-For a regular user to be able to run `db.cdc.query`, the user must have been granted execute privileges as well as boosted execute privileges.
-
-[source, cypher]
-----
-GRANT EXECUTE PROCEDURE db.cdc.query ON DBMS TO $role;
-GRANT EXECUTE BOOSTED PROCEDURE db.cdc.query ON DBMS TO $role;
-----
-
-[NOTE]
-====
-Non-boosted execute privileges are usually part of the `PUBLIC` role, in which case they do not need to be granted a second time.
-====
-
-Furthermore, the user does not have access to a database unless they have been granted access.
-
-[source, cypher]
-----
-GRANT ACCESS ON DATABASE $database TO $role
-----
-
-[NOTE]
-====
-Usually the `PUBLIC` role already has access to the default database.
-====
-
-The procedures xref:procedures/index.adoc#current[`db.cdc.current`] and xref:procedures/index.adoc#earliest[`db.cdc.earliest`] do not require admin privileges. In order to execute these, access to the database and regular execution privileges are sufficient.
-
-For more details regarding procedure privileges in Neo4j, see link:{neo4j-docs-base-uri}/operations-manual/{page-version}/authentication-authorization/manage-execute-permissions[Operations Manual -> Manage procedure and user-defined function permissions].
+include::partial$get-started.adoc[tags=security]
 
 
 [[disk-size]]
@@ -128,18 +101,38 @@ Enabling change data capture on a database causes more data to be written into t
 This means that the log files are rotated more frequently and log pruning is activated sooner (based on your configuration).
 The disk may run out of space if the disk size for transaction log storage is limited, so ensure that you have plenty of available space.
 
-In particular, **plan for a 50% increase in data written to the transaction log with `DIFF` enrichment mode, and 75% for `FULL` enrichment mode.**
+In particular, **plan for a 50% increase in data written to the transaction log with `DIFF` CDC mode, and 75% for `FULL` CDC mode.**
 Actual disk usage depends on the application, data model and transaction characteristics.
 
 
 [[log-retention]]
 === Transaction log retention
 
-Since Neo4j stores change data capture information inside transaction log entries, you should configure the transaction log retention period based on your application requirements.
+Since CDC information is stored in transaction log entries, the time for which the logs are retained dictates how much back in time your application may query for CDC data.
 
-The number of hours or days to keep the transaction log depends on your CDC use case, but as a general rule of thumb you can pick the period based on downtime tolerance of your downstream application so that the changes you have not yet processed are not pruned.
+The number of hours or days to keep the transaction log depends on your use case, but as a general rule of thumb you can pick a period greater or equal to the downtime tolerance of your downstream application, so that the changes don't get pruned before the application has had time to process them.
 
-For more details on transaction log retention and how to configure it, see link:{neo4j-docs-base-uri}/operations-manual/{page-version}/configuration/transaction-logs/#transaction-logging-log-retention[Operations Manual -> Configuration -> Transaction Log].
+.Transaction log configuration and CDC behavior
+====
+This example shows the behavior that results from a given configuration.
+
+`db.tx_log.rotation.size = 256M` +
+`db.tx_log.rotation.retention_policy = 2G 1Day` +
+`db.checkpoint.interval.time = 15m` +
+`db.checkpoint.interval.tx = 100000`
+
+As new transactions come in, the server writes them to a log file. When that file exceeds 256MB, it creates a new file and continues writing there (transactions are never broken across files though, so if the current log is 255MB when a new 5MB transaction comes in, the file will grow to 260MB before rotating to a new file).
+
+Every 15 minutes _or_ 100000 transactions (whichever happens first), the server goes through the transaction log files from newer to oldest.
+When the sum of the scanned files is greater than 2GB, all subsequent files are deleted, including the latest scanned one, so that the total size is again below 2GB.
+Files older than 1 day are also deleted.
+
+In other words, the server keeps _at most_ 2GB worth of transaction logs, as long as they are all more recent than 1 day.
+As long as they are all more recent than 1 day, the server keeps _at least_ `2GB - 256MB` worth of transaction logs (256MB are always needed for the current log file to grow into).
+In case large transactions resulted in log files larger than 256MB, the minimum retained size of logs may be smaller than `2GB - 256MB`.
+====
+
+For more details on transaction log files and how to configure them, see link:{neo4j-docs-base-uri}/operations-manual/{page-version}/configuration/transaction-logs/[Transaction logging].
 
 
 [[non-tx-log-changes]]
