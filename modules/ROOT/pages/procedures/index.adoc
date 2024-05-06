@@ -213,7 +213,7 @@ CREATE (:Person:Hero {name: 'Batman', color: 'black'})
 ----
 
 .Transaction 3 -- Retrieve change event for `Person` node creation
-[source, cypher, test-result-skip]
+[source, cypher, test-fail=Neo.ClientError.ChangeDataCapture.InvalidIdentifier]
 ----
 WITH 'BaQswf9NV0b7qicwDdh7vfwAAAAAAAAD83__________AAABjzfm4bM=' AS previousId
 CALL db.cdc.query(previousId) YIELD event, metadata RETURN event, metadata
