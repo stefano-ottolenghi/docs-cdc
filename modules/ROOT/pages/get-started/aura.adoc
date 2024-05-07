@@ -60,12 +60,9 @@ include::partial$get-started.adoc[tags=security]
 
 Since CDC information is stored in transaction log entries, the time for which the logs are retained dictates how much back in time your application may query for CDC data.
 
-As new transactions come in, the server writes them to a log file. When that file exceeds 256MB, it creates a new file and continues writing there (transactions are never broken across files though, so if the current log is 255MB when a new 5MB transaction comes in, the file will grow to 260MB before rotating to a new file).
+The amount of disk space reserved for transaction logs is fixed, and logs are rotated and pruned regularly to ensure their size doesn't grow beyond the threshold.
+When logs get pruned, your CDC application loses access to the transactions contained in the deleted files.
+Normally this is not an issue, as applications are meant to consume changes in (quasi) real time. Should your CDC application be unavailable for too long a time though, some of the oldest unconsumed changes may have already been pruned by the time it is available again.
 
-Every 15 minutes _or_ 100000 transactions (whichever happens first), the server goes through the transaction log files from newer to oldest.
-When the sum of the scanned files is greater than 2GB, all subsequent files are deleted, including the latest scanned one, so that the total size is again below 2GB.
-Files older than 1 day are also deleted.
+Although xref:procedures/index.adoc#earliest-change-event[retrieving the earliest change event] may help you get a feeling for how far back in time your database's transaction logs are retained, you should be careful in making assumptions based on that: *the rate at which old transactions are pruned from logs depends on the number and size of incoming transactions*, and is thus likely to oscillate over time.
 
-In other words, the server keeps _at most_ 2GB worth of transaction logs, as long as they are all more recent than 1 day.
-Regarding size, the server keeps _at least_ `2GB - 256MB` worth of transaction logs (256MB are always needed for the current log file to grow into) -- some may however be deleted if they are older than 1 day.
-In case large transactions made log files grow larger than 256MB, the minimum total retained size may be smaller than `2GB - 256MB`.

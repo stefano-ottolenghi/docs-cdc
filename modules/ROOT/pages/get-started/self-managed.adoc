@@ -111,8 +111,11 @@ Actual disk usage depends on the application, data model and transaction charact
 Since CDC information is stored in transaction log entries, the time for which the logs are retained dictates how much back in time your application may query for CDC data.
 As a general rule of thumb, you can pick a period greater or equal to the downtime tolerance of your downstream application, so that the changes don't get pruned before the application has had time to process them.
 
-You can control the transaction log retention period through the configuration setting `db.tx_log.rotation.retention_policy`. +
-For more details on transaction log files and how to configure them, see link:{neo4j-docs-base-uri}/operations-manual/{page-version}/configuration/transaction-logs/[Transaction logging].
+You can control the transaction log retention period through the configuration setting `db.tx_log.rotation.retention_policy`. For more details on transaction log files and how to configure them, see link:{neo4j-docs-base-uri}/operations-manual/{page-version}/configuration/transaction-logs/[Transaction logging].
+
+[TIP]
+Transaction logs are used not only by CDC, but also by differential backups and cluster operations.
+When setting a retention period for your CDC needs, keep in mind that it may affect other areas of your system.
 
 .Transaction log configuration and CDC behavior
 ====
