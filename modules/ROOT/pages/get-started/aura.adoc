@@ -43,8 +43,8 @@ Disabling and then re-enabling CDC is equivalent to enabling it for the first ti
 
 
 [[pause-resume]]
-=== Paused/Resumed databases
-Although it is possible to pause a database that has CDC mode set to `DIFF` or `FULL`, **the CDC mode gets set to `OFF` when the database is resumed**.
+=== Pause/Resume databases
+It is not recommended to pause a database that has CDC mode set to `DIFF` or `FULL`, as **the CDC mode gets set to `OFF` when the database is resumed**.
 
 When an instance is resumed, it behaves similarly to https://neo4j.com/docs/cdc/current/backup-restore/[restoring a snapshot].
 
