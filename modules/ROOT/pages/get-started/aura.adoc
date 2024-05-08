@@ -58,7 +58,7 @@ include::partial$get-started.adoc[tags=security]
 [[log-retention]]
 === Transaction log retention
 
-Since CDC information is stored in transaction log entries, the time for which the logs are retained dictates how much back in time your application may query for CDC data.
+Since CDC information is stored in transaction log entries, the time for which the logs are retained dictates how far back in time your application may query for CDC data.
 
 The amount of disk space reserved for transaction logs is fixed, and logs are rotated and pruned regularly to ensure their size doesn't grow beyond the threshold.
 When logs get pruned, your CDC application loses access to the transactions contained in the deleted files.
