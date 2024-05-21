@@ -1,0 +1,69 @@
+= CDC on Neo4j Aura
+:page-role: beta enterprise-edition aura-db-enterprise
+
+include::partial$get-started.adoc[tags=intro]
+
+
+[[toggle-cdc-mode]]
+== Enable/Toggle CDC mode
+
+Admin users can tweak the CDC mode for a database through the setting  *Edit CDC Mode*, accessible via the Aura instance options.
+Non-admin users may view the current CDC mode, but may not edit it.
+
+[IMPORTANT]
+====
+Modifying CDC mode from `DIFF` to `FULL` or vice-versa immediately changes the  xref:procedures/output-schema.adoc[structure of captured changes].
+Your CDC application must be able to deal with the change of format.
+====
+
+
+[[disable-cdc]]
+== Disable CDC
+
+Admin users can disable CDC for a database through the setting  *Edit CDC Mode*, accessible via the Aura instance options.
+Set the mode to `OFF`.
+Only admin users can disable CDC mode for a database.
+
+[WARNING]
+====
+Disabling CDC immediately breaks the continuity of change events.
+**Change identifiers generated before disabling can no longer be used and, even if CDC is re-enabled, the previously-generated change identifiers remain invalid.**
+Disabling and then re-enabling CDC is equivalent to enabling it for the first time: there is no memory of previous changes.
+====
+
+*CDC is automatically disabled for:*
+
+* New instances
+* Cloned instances
+* Paused instances
+* Instances restored from a snapshot
+
+
+[[key-considerations]]
+== Key considerations
+
+
+[[pause-resume]]
+=== Pause/Resume databases
+It is not recommended to pause a database that has CDC mode set to `DIFF` or `FULL`, as **the CDC mode gets set to `OFF` when the database is resumed**.
+
+When an instance is resumed, it behaves similarly to https://neo4j.com/docs/cdc/current/backup-restore/[restoring a snapshot].
+
+
+[[security]]
+=== Security
+
+include::partial$get-started.adoc[tags=security]
+
+
+[[log-retention]]
+=== Transaction log retention
+
+Since CDC information is stored in transaction log entries, the time for which the logs are retained dictates how far back in time your application may query for CDC data.
+
+The amount of disk space reserved for transaction logs is fixed, and logs are rotated and pruned regularly to ensure their size doesn't grow beyond the threshold.
+When logs get pruned, your CDC application loses access to the transactions contained in the deleted files.
+Normally this is not an issue, as applications are meant to consume changes in (quasi) real time. Should your CDC application be unavailable for too long a time though, some of the oldest unconsumed changes may have already been pruned by the time it is available again.
+
+Although xref:procedures/index.adoc#earliest-change-event[retrieving the earliest change event] may help you get a feeling for how far back in time your database's transaction logs are retained, you should be careful in making assumptions based on that: *the rate at which old transactions are pruned from logs depends on the number and size of incoming transactions*, and is thus likely to oscillate over time.
+

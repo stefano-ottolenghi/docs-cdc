@@ -1,7 +1,8 @@
 * xref:index.adoc[]
-// * xref:get-started/index.adoc[]
-* xref:get-started/self-managed.adoc[]
-// ** xref:get-started/aura.adoc[]
+
+* Enable CDC
+** xref:get-started/self-managed.adoc[Neo4j DBMS]
+** xref:get-started/aura.adoc[Neo4j Aura]
 
 * xref:procedures/index.adoc[]
 // TODO maybe have a "previous" here, indicating how to fetch the ID from the previous
