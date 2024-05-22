@@ -50,12 +50,6 @@ It is not recommended to pause a database that has CDC mode set to `DIFF` or `FU
 When an instance is resumed, it behaves similarly to https://neo4j.com/docs/cdc/current/backup-restore/[restoring a snapshot].
 
 
-[[security]]
-=== Security
-
-include::partial$get-started.adoc[tags=security]
-
-
 [[log-retention]]
 === Transaction log retention
 
