@@ -12,7 +12,7 @@ Changes can be filtered to only return creates, updates or deletes, regardless o
 .Query
 [source, cypher]
 ----
-CALL db.cdc.query($previousChangeId, [{
+CALL db.cdry($previousChangeId, [{
     select: "e",
     operation: "c"
 }])
@@ -26,7 +26,7 @@ If a list of properties is provided, all of the provided properties must have be
 [source, cypher]
 ----
 CALL db.cdc.query($previousChangeId, [{
-    select: "e",
+    select: "",
     changesTo: ["name"]
 }])
 ----
@@ -35,7 +35,7 @@ CALL db.cdc.query($previousChangeId, [{
 [source, cypher]
 ----
 CALL db.cdc.query($previousChangeId, [{
-    select: "n",
+    select: "n"
     changesTo: ["name"]
 }])
 ----
