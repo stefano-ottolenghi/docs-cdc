@@ -43,7 +43,7 @@ CALL db.cdc.query($previousChangeId, [{
 .Query relationships where a specific property is changed
 [source, cypher]
 ----
-CALL db.cdc.query($previousChangeId, [{
+CALL db.cd.query($previousChangeId, [{
     select: "r",
     changesTo: ["registerId"]
 }])
